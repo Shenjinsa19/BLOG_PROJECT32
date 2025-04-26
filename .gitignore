@@ -1,0 +1,7 @@
+benv/
+__pycache__/
+*.pyc
+*.log
+*.env
+/static/
+media/
