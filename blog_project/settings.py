@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,9 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+b$tnklyn2-=25mmnmg29=fb2$0s(@t)mn$6$lc+bmdmb)-t9-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['blog-project.onrender.com', 'localhost', '127.0.0.1']
+
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
 
 
 
@@ -87,17 +89,31 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 #     }
 # }
 import os
+import dj_database_url
+import os
+from dotenv import load_dotenv
+load_dotenv()  # Loads environment variables from a .env file
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('railway'),  # The database name from Railway
-        'USER': os.environ.get('root'),  # The database user from Railway
-        'PASSWORD': os.environ.get('IcGJDlEJzzKNQukSOxBypXTJKfQUlrzG'),  # The database password from Railway
-        'HOST': os.environ.get('DB_HOST', 'yamabiko.proxy.rlwy.net'),  # The host from Railway
-        'PORT': os.environ.get('DB_PORT', '3306'),  # MySQL default port
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL', 'mysql://root:password@localhost:3306/dbname')  # Provide a fallback URL for local testing
+    )
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME', 'railway'),
+#         'USER': os.environ.get('DB_USER', 'root'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD', 'KzrReXyJDrJTYAljkRoxnlvLYrTVVeqP'),
+#         'HOST': os.environ.get('DB_HOST', 'centerbeam.proxy.rlwy.net'),
+#         'PORT': os.environ.get('DB_PORT', '38380'),
+#     }
+# }
+
+
+
+
 
 # DATABASES = {
 #     'default': {
@@ -164,3 +180,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+import os
+
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['your-render-service.onrender.com', 'localhost', '127.0.0.1']
+
+# Static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Render specific: Automatically collectstatic
+if os.getenv('RENDER'):
+    DEBUG = False
