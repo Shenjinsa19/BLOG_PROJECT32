@@ -1,0 +1,10 @@
+from django.urls import path
+from blog import views  
+from .views import createview,detailview
+
+urlpatterns = [
+    path('create/', createview.as_view(), name='post-list-create'),
+    path('detail/<int:pk>/', detailview.as_view(), name='post-detail'),
+    path('register/', views.register.as_view(), name='register'),
+    path('login/', views.login.as_view(), name='login'),
+]
