@@ -194,3 +194,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Render specific: Automatically collectstatic
 if os.getenv('RENDER'):
     DEBUG = False
+CSRF_TRUSTED_ORIGINS = ['https://blog-project32.onrender.com', 'http://127.0.0.1:8000', 'http://localhost:8000']
+SESSION_COOKIE_DOMAIN = '.onrender.com'
+CSRF_COOKIE_DOMAIN = '.onrender.com'
