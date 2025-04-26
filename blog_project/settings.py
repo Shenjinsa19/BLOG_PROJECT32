@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+b$tnklyn2-=25mmnmg29=fb2$0s(@t)mn$6$lc+bmdmb)-t9-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['blog-project-1-qzan.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 
@@ -86,17 +86,29 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 #         'PORT': '3306',                # The port number for MySQL(default is 3306)
 #     }
 # }
+import os
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'railway',
-        'USER': 'root',
-        'PASSWORD': 'IcGJDlEJzzKNQukSOxBypXTJKfQUlrzG',
-        'HOST': 'yamabiko.proxy.rlwy.net',
-        'PORT': '35906',
+        'NAME': os.environ.get('railway'),  # The database name from Railway
+        'USER': os.environ.get('root'),  # The database user from Railway
+        'PASSWORD': os.environ.get('IcGJDlEJzzKNQukSOxBypXTJKfQUlrzG'),  # The database password from Railway
+        'HOST': os.environ.get('DB_HOST', 'yamabiko.proxy.rlwy.net'),  # The host from Railway
+        'PORT': os.environ.get('DB_PORT', '3306'),  # MySQL default port
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'railway',
+#         'USER': 'root',
+#         'PASSWORD': 'IcGJDlEJzzKNQukSOxBypXTJKfQUlrzG',
+#         'HOST': 'yamabiko.proxy.rlwy.net',
+#         'PORT': '3306',
+#     }
+# }
 
 
 # DATABASES = {
