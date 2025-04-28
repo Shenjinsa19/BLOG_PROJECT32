@@ -89,10 +89,8 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 #         'HOST': 'localhost',           # The host where your MySQL database is running (usually localhost)
 #         'PORT': '3306',                # The port number for MySQL(default is 3306)
 #     }
-# }
-import os
+
 import dj_database_url
-import os
 from dotenv import load_dotenv
 load_dotenv()  # Loads environment variables from a .env file
 
