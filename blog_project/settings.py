@@ -193,5 +193,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Render specific: Automatically collectstatic
 if os.getenv('RENDER'):
-    DEBUG = True
+    DEBUG = False
 CSRF_TRUSTED_ORIGINS = ['https://blog-project32.onrender.com']
