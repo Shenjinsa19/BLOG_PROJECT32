@@ -1,2 +1,2 @@
-web: gunicorn blog_project.wsgi
+web: gunicorn blog_project.wsgi:application
 
