@@ -170,7 +170,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-
+STATIC_URL = 'static/'
 
 
 # Default primary key field type
@@ -189,10 +189,10 @@ ALLOWED_HOSTS = ['blog-project32.onrender.com', 'localhost', '127.0.0.1']
 
 # Static files settings
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Render specific: Automatically collectstatic
 if os.getenv('RENDER'):
-    DEBUG = True
+    DEBUG = False
 CSRF_TRUSTED_ORIGINS = ['https://blog-project32.onrender.com']
