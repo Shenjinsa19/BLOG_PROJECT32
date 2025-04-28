@@ -184,7 +184,7 @@ REST_FRAMEWORK = {
 }
 import os
 
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['blog-project32.onrender.com', 'localhost', '127.0.0.1']
 
 # Static files settings
@@ -194,5 +194,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Render specific: Automatically collectstatic
 if os.getenv('RENDER'):
-    DEBUG = False
+    DEBUG = True
 CSRF_TRUSTED_ORIGINS = ['https://blog-project32.onrender.com']
