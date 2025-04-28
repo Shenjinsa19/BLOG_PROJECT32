@@ -185,7 +185,7 @@ REST_FRAMEWORK = {
 import os
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['blog_project32.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['blog-project32.onrender.com', 'localhost', '127.0.0.1']
 
 # Static files settings
 STATIC_URL = '/static/'
