@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
 from .models import Post
+from .models import Category
 from .serializers import PostSerializer
 from django.shortcuts import render
 from rest_framework.authtoken.models import Token
@@ -71,4 +72,9 @@ class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  
+from .serializers import CategorySerializer
+
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
