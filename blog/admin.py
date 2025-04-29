@@ -2,6 +2,6 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import myusers
+from .models import Post
 
-admin.site.register(myusers)
+admin.site.register(Post)

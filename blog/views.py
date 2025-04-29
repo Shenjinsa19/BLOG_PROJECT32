@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
-from .models import myusers
+from .models import Post
 from .serializers import PostSerializer
 from django.shortcuts import render
 from rest_framework.authtoken.models import Token
@@ -10,10 +10,9 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
- # Adjust if needed
 
-class createview(generics.ListCreateAPIView):
-    queryset=myusers.objects.all()
+class PostListCreateView(generics.ListCreateAPIView):
+    queryset=Post.objects.all()
     serializer_class=PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     def perform_create(self,serializer):
@@ -24,15 +23,15 @@ class createview(generics.ListCreateAPIView):
             return[permissions.IsAuthenticated()]
         return []
 
-class detailview(generics.RetrieveUpdateDestroyAPIView):
-    queryset=myusers.objects.all()
+class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset=Post.objects.all()
     serializer_class=PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     def get_permissions(self):
         if self.request.method in ['PUT','DELETE']:
             return [permissions.IsAuthenticated(), IsOwnerOrAdmin()]
         return []
-class register(APIView):
+class RegisterView(APIView):
     def post(self, request):
         username=request.data.get('username')
         email=request.data.get('email')
@@ -46,7 +45,7 @@ class register(APIView):
         token = Token.objects.create(user=user)
         return Response({'token': token.key}, status=201)
 
-class login(APIView):
+class LoginView(APIView):
     def post(self, request):
         username=request.data.get('username')
         password=request.data.get('password')
@@ -71,5 +70,5 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  # Optional: Adjust if needed
+    permission_classes = [IsAuthenticatedOrReadOnly]  
 
