@@ -9,11 +9,12 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-class createview(generics.CreateAPIView):
+class createview(generics.ListCreateAPIView):
     queryset=myusers.objects.all()
     serializer_class=PostSerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def perform_create(self,serializer):
         serializer.save(author=self.request.user)
 
@@ -25,7 +26,7 @@ class createview(generics.CreateAPIView):
 class detailview(generics.RetrieveUpdateDestroyAPIView):
     queryset=myusers.objects.all()
     serializer_class=PostSerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly]
     def get_permissions(self):
         if self.request.method in ['PUT','DELETE']:
             return [permissions.IsAuthenticated(), IsOwnerOrAdmin()]
