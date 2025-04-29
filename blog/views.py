@@ -10,6 +10,7 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+ # Adjust if needed
 
 class createview(generics.ListCreateAPIView):
     queryset=myusers.objects.all()
@@ -62,4 +63,13 @@ class IsOwnerOrAdmin(BasePermission):
         return obj.author == request.user or request.user.is_staff
 
 
+from rest_framework import generics
+from django.contrib.auth.models import User
+from .serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]  # Optional: Adjust if needed
 
