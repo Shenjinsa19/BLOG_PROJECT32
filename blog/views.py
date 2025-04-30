@@ -65,16 +65,14 @@ class IsOwnerOrAdmin(BasePermission):
 
 from rest_framework import generics
 from django.contrib.auth.models import User
-from .serializers import UserSerializer
+from .serializers import UserSerializer,CategorySerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  
-from .serializers import CategorySerializer
-
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
+    permission_classes = [IsAuthenticatedOrReadOnly]

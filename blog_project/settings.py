@@ -100,7 +100,7 @@ load_dotenv()  # Loads environment variables from a .env file
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'mysql://root:password@localhost:3306/dbname')  # Provide a fallback URL for local testing
+        default=os.environ.get('DATABASE_URL', 'mysql://root:password@localhost:3306/dbname')  
     )
 }
 
