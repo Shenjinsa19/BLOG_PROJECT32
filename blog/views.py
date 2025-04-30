@@ -53,10 +53,8 @@ class IsOwnerOrAdmin(BasePermission):
         return obj.author == request.user or request.user.is_staff
 
 
-from rest_framework import generics
-from django.contrib.auth.models import User
+
 from .serializers import UserSerializer,CategorySerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
