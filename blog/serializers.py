@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from .models import Post,Category
+from blog.models import Post,Category
 
 class PostSerializer(serializers.ModelSerializer):
+    total_likes = serializers.IntegerField(source='total_likes', read_only=True)
     class Meta:
         model = Post
-        fields = ['id','title','content','author','category','author','created_at']
+        fields = ['id','title','content','author','category','author','created_at','total_likes']
         read_only_fields = ['author','created_at']
 from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):

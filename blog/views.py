@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
-from .models import Post
+from blog.models import Post
 from .models import Category
 from .serializers import PostSerializer
 from django.shortcuts import render
@@ -11,6 +11,38 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+def like_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=404)
+
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+        return Response({"message": "Like removed"})
+    else:
+        post.likes.add(request.user)
+        post.dislikes.remove(request.user)  # remove dislike if it exists
+        return Response({"message": "Post liked"})
+
+def dislike_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=404)
+
+    if request.user in post.dislikes.all():
+        post.dislikes.remove(request.user)
+        return Response({"message": "Dislike removed"})
+    else:
+        post.dislikes.add(request.user)
+        post.likes.remove(request.user)  # remove like if it exists
+        return Response({"message": "Post disliked"})
+
+def my_disliked_posts(request):
+    posts = request.user.disliked_posts.all()
+    return Response([{"id": post.id, "title": post.title} for post in posts])
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset=Post.objects.all()
@@ -87,7 +119,7 @@ class RegisterView(APIView):
                 username=username,
                 email=email,
                 password=password
-            )
+            )   
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=201)
         return Response(serializer.errors, status=400)
