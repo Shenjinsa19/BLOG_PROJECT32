@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from blog.models import Post,Category,Like,Dislike,Comment,CommentLike
+from blog.models import Post,Category,Like,Dislike,Comment,CommentLike,CommentDislike
 from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,7 +15,7 @@ class PostSerializer(serializers.ModelSerializer):
     liked_by = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by' ]
+        fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by ']
     def get_like_count(self, obj):
         return Like.objects.filter(post=obj).count()
     def get_dislike_count(self, obj):
@@ -70,15 +70,6 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_like_count(self, obj):
         return CommentLike.objects.filter(comment=obj).count()
-    # def get_liked_by(self, obj):
-    #     return list(
-    #         CommentLike.objects.filter(comment=obj)
-    #         .select_related('user')
-    #         .values_list('user__username', flat=True)
-    #     )
-
-
-
 
     def get_liked_by(self, obj):
        return [like.user.username for like in CommentLike.objects.filter(comment=obj)]

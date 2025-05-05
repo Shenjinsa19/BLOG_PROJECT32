@@ -53,6 +53,12 @@ class Comment(models.Model):
 
     def is_reply(self):
         return self.parent is not None
+    
+    def total_likes(self):
+        return self.likes.count()
+
+    def total_dislikes(self):
+        return self.dislikes.count()
 class CommentLike(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
@@ -65,4 +71,16 @@ class CommentLike(models.Model):
 
     def __str__(self):
         return f'{self.user.username} liked comment {self.comment.id}'
+class CommentDislike(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='dislikes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'comment')
+        verbose_name = "Comment Dislike"
+        verbose_name_plural = "Comment Dislikes"
+
+    def __str__(self):
+        return f'{self.user.username} disliked comment {self.comment.id}'
 

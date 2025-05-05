@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
-from blog.models import Post,Like,Dislike,Comment,CommentLike
+from blog.models import Post,Like,Dislike,Comment,CommentLike,CommentDislike
 from .models import Category
 from .serializers import PostSerializer,CommentSerializer
 from django.shortcuts import render
@@ -132,6 +132,31 @@ class RegisterView(APIView):
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=201)
         return Response(serializer.errors, status=400)
+class CommentLikeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user = request.user
+        like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
+        if not created:
+            like.delete()  # Remove like if already liked
+            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
+        return Response({"message": "Comment liked."}, status=status.HTTP_201_CREATED)
+
+class CommentDislikeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user = request.user
+        CommentLike.objects.filter(user=user, comment=comment).delete()
+        dislike, created = CommentDislike.objects.get_or_create(user=user, comment=comment)
+        if not created:
+            dislike.delete()  # Remove dislike if already disliked
+            return Response({"message": "Dislike removed."}, status=status.HTTP_200_OK)
+        return Response({"message": "Comment disliked."}, status=status.HTTP_201_CREATED)
+
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -151,18 +176,7 @@ class CommentReplyListView(generics.ListAPIView):
     def get_queryset(self):
         comment_id = self.kwargs['comment_id']
         return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
-class CommentLikeView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def post(self, request, comment_id):
-        comment = get_object_or_404(Comment, id=comment_id)
-        user = request.user
-
-        like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
-        if not created:
-            like.delete()
-            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
-        return Response({"message": "Comment liked."}, status=status.HTTP_201_CREATED)
 from rest_framework.generics import RetrieveAPIView
 class CommentDetailWithRepliesView(RetrieveAPIView):
     queryset = Comment.objects.all()
