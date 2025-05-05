@@ -1,8 +1,8 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
-from blog.models import Post,Like,Dislike
+from blog.models import Post,Like,Dislike,Comment,CommentLike
 from .models import Category
-from .serializers import PostSerializer
+from .serializers import PostSerializer,CommentSerializer
 from django.shortcuts import render
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -32,7 +33,7 @@ def like_post(request, post_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def dislike_post(request, post_id):
+def dislike_post(request,post_id):
     try:
         post = Post.objects.get(id=post_id)
         user = request.user
@@ -71,6 +72,7 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PUT','DELETE']:
             return [permissions.IsAuthenticated(), IsOwnerOrAdmin()]
         return []
+    
 class RegisterView(APIView):
     def post(self, request):
         username=request.data.get('username')
@@ -80,10 +82,10 @@ class RegisterView(APIView):
             return Response({'error':'All fields are required.'}, status=400)
         if User.objects.filter(username=username).exists():
             return Response({'error':'username already exists.'},status=400)
-
         user = User.objects.create_user(username=username,email=email,password=password)
         token = Token.objects.create(user=user)
         return Response({'token': token.key}, status=201)
+    
 from .serializers import LoginSerializer
 from .serializers import RegisterSerializer
 from rest_framework.permissions import BasePermission
@@ -91,18 +93,17 @@ class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self,request,view,obj):
         return obj.author == request.user or request.user.is_staff
 
-
-
 from .serializers import UserSerializer,CategorySerializer
-
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]  
+
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
@@ -115,6 +116,7 @@ class LoginView(APIView):
                 return Response({'token': token.key})
             return Response({'error': 'Invalid credentials'}, status=400)
         return Response(serializer.errors, status=400)
+    
 class RegisterView(APIView):
     def post(self,request):
         serializer=RegisterSerializer(data=request.data)
@@ -130,3 +132,39 @@ class RegisterView(APIView):
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=201)
         return Response(serializer.errors, status=400)
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        post_id = self.kwargs['post_id']
+        return Comment.objects.filter(post_id=post_id, parent=None).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        post_id = self.kwargs['post_id']
+        post = get_object_or_404(Post, id=post_id)
+        serializer.save(user=self.request.user, post=post)
+class CommentReplyListView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        comment_id = self.kwargs['comment_id']
+        return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
+class CommentLikeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
+        user = request.user
+
+        like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
+        if not created:
+            like.delete()
+            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
+        return Response({"message": "Comment liked."}, status=status.HTTP_201_CREATED)
+from rest_framework.generics import RetrieveAPIView
+class CommentDetailWithRepliesView(RetrieveAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

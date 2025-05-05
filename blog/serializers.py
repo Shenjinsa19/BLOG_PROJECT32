@@ -1,29 +1,25 @@
 from rest_framework import serializers
-from blog.models import Post,Category,Like,Dislike
+from blog.models import Post,Category,Like,Dislike,Comment,CommentLike
 from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [ 'username']
+        
 from rest_framework import serializers
 from blog.models import Post
 from django.contrib.auth.models import User
-
 class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
     liked_by = serializers.SerializerMethodField()
-
     class Meta:
         model = Post
         fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by' ]
-
     def get_like_count(self, obj):
         return Like.objects.filter(post=obj).count()
-
     def get_dislike_count(self, obj):
         return Dislike.objects.filter(post=obj).count()
-
     def get_liked_by(self, obj):
         return [like.user.username for like in Like.objects.filter(post=obj)]
 
@@ -58,4 +54,31 @@ class RegisterSerializer(serializers.ModelSerializer):
             user=User.objects.create_user(**validated_data)
             return()
                                                 
+class CommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    like_count = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user.username', read_only=True)
+    liked_by = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Comment
+        fields = ['id', 'post', 'user', 'username', 'content', 'parent', 'created_at', 'replies', 'like_count','liked_by']
+
+    def get_replies(self, obj):
+      replies = Comment.objects.filter(parent=obj).order_by('created_at')
+      return CommentSerializer(replies, many=True, context=self.context).data
+
+    def get_like_count(self, obj):
+        return CommentLike.objects.filter(comment=obj).count()
+    # def get_liked_by(self, obj):
+    #     return list(
+    #         CommentLike.objects.filter(comment=obj)
+    #         .select_related('user')
+    #         .values_list('user__username', flat=True)
+    #     )
+
+
+
+
+    def get_liked_by(self, obj):
+       return [like.user.username for like in CommentLike.objects.filter(comment=obj)]
