@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
-from blog.models import Post
+from blog.models import Post,Like,Dislike
 from .models import Category
 from .serializers import PostSerializer
 from django.shortcuts import render
@@ -11,38 +11,46 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def like_post(request, post_id):
     try:
         post = Post.objects.get(id=post_id)
+        user = request.user
+        Dislike.objects.filter(user=user, post=post).delete()
+        like_obj, created = Like.objects.get_or_create(user=user, post=post)
+        if not created:
+            like_obj.delete()
+            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Post liked."}, status=status.HTTP_200_OK)
     except Post.DoesNotExist:
-        return Response({"error": "Post not found"}, status=404)
+        return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user in post.likes.all():
-        post.likes.remove(request.user)
-        return Response({"message": "Like removed"})
-    else:
-        post.likes.add(request.user)
-        post.dislikes.remove(request.user)  # remove dislike if it exists
-        return Response({"message": "Post liked"})
-
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def dislike_post(request, post_id):
     try:
         post = Post.objects.get(id=post_id)
+        user = request.user
+        Like.objects.filter(user=user, post=post).delete()
+        dislike_obj, created = Dislike.objects.get_or_create(user=user, post=post)
+        if not created:
+            dislike_obj.delete()
+            return Response({"message": "Dislike removed."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "Post disliked."}, status=status.HTTP_200_OK)
     except Post.DoesNotExist:
-        return Response({"error": "Post not found"}, status=404)
-
-    if request.user in post.dislikes.all():
-        post.dislikes.remove(request.user)
-        return Response({"message": "Dislike removed"})
-    else:
-        post.dislikes.add(request.user)
-        post.likes.remove(request.user)  # remove like if it exists
-        return Response({"message": "Post disliked"})
-
+        return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def my_disliked_posts(request):
-    posts = request.user.disliked_posts.all()
-    return Response([{"id": post.id, "title": post.title} for post in posts])
+    disliked_posts = [dislike.post for dislike in Dislike.objects.filter(user=request.user)]
+    serializer = PostSerializer(disliked_posts, many=True, context={'request': request})
+    return Response(serializer.data)
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset=Post.objects.all()
@@ -50,7 +58,6 @@ class PostListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     def perform_create(self,serializer):
         serializer.save(author=self.request.user)
-
     def get_permissions(self):
         if self.request.method=='POST':
             return[permissions.IsAuthenticated()]
@@ -123,16 +130,3 @@ class RegisterView(APIView):
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=201)
         return Response(serializer.errors, status=400)
-# class RegisterView(APIView):
-#     def post(self, request):
-#         username=request.data.get('username')
-#         email=request.data.get('email')
-#         password=request.data.get('password')
-#         if not username or not email or not password:
-#             return Response({'error':'All fields are required.'}, status=400)
-#         if User.objects.filter(username=username).exists():
-#             return Response({'error':'username already exists.'},status=400)
-
-#         user = User.objects.create_user(username=username,email=email,password=password)
-#         token = Token.objects.create(user=user)
-#         return Response({'token': token.key}, status=201)

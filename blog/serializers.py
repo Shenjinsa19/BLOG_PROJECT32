@@ -1,12 +1,33 @@
 from rest_framework import serializers
-from blog.models import Post,Category
+from blog.models import Post,Category,Like,Dislike
+from django.contrib.auth.models import User
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [ 'username']
+from rest_framework import serializers
+from blog.models import Post
+from django.contrib.auth.models import User
 
 class PostSerializer(serializers.ModelSerializer):
-    total_likes = serializers.IntegerField(source='total_likes', read_only=True)
+    like_count = serializers.SerializerMethodField()
+    dislike_count = serializers.SerializerMethodField()
+    liked_by = serializers.SerializerMethodField()
+
     class Meta:
         model = Post
-        fields = ['id','title','content','author','category','author','created_at','total_likes']
-        read_only_fields = ['author','created_at']
+        fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by' ]
+
+    def get_like_count(self, obj):
+        return Like.objects.filter(post=obj).count()
+
+    def get_dislike_count(self, obj):
+        return Dislike.objects.filter(post=obj).count()
+
+    def get_liked_by(self, obj):
+        return [like.user.username for like in Like.objects.filter(post=obj)]
+
+
 from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
