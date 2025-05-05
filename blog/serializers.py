@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from blog.models import Post,Category,Like,Dislike,Comment,CommentLike,CommentDislike
 from django.contrib.auth.models import User
+from blog.models import Post
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [ 'username']
         
-from rest_framework import serializers
-from blog.models import Post
-from django.contrib.auth.models import User
+
 class PostSerializer(serializers.ModelSerializer):
     like_count = serializers.SerializerMethodField()
     dislike_count = serializers.SerializerMethodField()
@@ -24,15 +24,16 @@ class PostSerializer(serializers.ModelSerializer):
         return [like.user.username for like in Like.objects.filter(post=obj)]
 
 
-from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [ 'username']
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
+        
 class LoginSerializer(serializers.ModelSerializer):
         username = serializers.CharField()
         password=serializers.CharField(write_only=True)

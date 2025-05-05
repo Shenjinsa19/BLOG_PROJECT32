@@ -2,7 +2,7 @@ from rest_framework import generics, permissions
 from .permissions import IsOwnerOrAdmin
 from blog.models import Post,Like,Dislike,Comment,CommentLike,CommentDislike
 from .models import Category
-from .serializers import PostSerializer,CommentSerializer
+from .serializers import PostSerializer,CommentSerializer,UserSerializer,CategorySerializer,RegisterSerializer,LoginSerializer
 from django.shortcuts import render
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -11,47 +11,50 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,BasePermission
 from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import RetrieveAPIView
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def like_post(request, post_id):
-    try:
-        post = Post.objects.get(id=post_id)
-        user = request.user
-        Dislike.objects.filter(user=user, post=post).delete()
-        like_obj, created = Like.objects.get_or_create(user=user, post=post)
-        if not created:
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        like_obj = Like.objects.filter(post=post, user=request.user).first()
+
+        if like_obj:
             like_obj.delete()
-            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
+            return Response({'message': 'Like removed'}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "Post liked."}, status=status.HTTP_200_OK)
-    except Post.DoesNotExist:
-        return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+            Dislike.objects.filter(post=post, user=request.user).delete()
+            Like.objects.create(post=post, user=request.user)
+            return Response({'message': 'Post liked'}, status=status.HTTP_201_CREATED)
+        
+class DislikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        dislike_obj = Dislike.objects.filter(post=post, user=request.user).first()
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def dislike_post(request,post_id):
-    try:
-        post = Post.objects.get(id=post_id)
-        user = request.user
-        Like.objects.filter(user=user, post=post).delete()
-        dislike_obj, created = Dislike.objects.get_or_create(user=user, post=post)
-        if not created:
+        if dislike_obj:
             dislike_obj.delete()
-            return Response({"message": "Dislike removed."}, status=status.HTTP_200_OK)
+            return Response({'message': 'Dislike removed'}, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "Post disliked."}, status=status.HTTP_200_OK)
-    except Post.DoesNotExist:
-        return Response({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def my_disliked_posts(request):
-    disliked_posts = [dislike.post for dislike in Dislike.objects.filter(user=request.user)]
-    serializer = PostSerializer(disliked_posts, many=True, context={'request': request})
-    return Response(serializer.data)
+            Like.objects.filter(post=post, user=request.user).delete()
+            Dislike.objects.create(post=post, user=request.user)
+            return Response({'message': 'Post disliked'}, status=status.HTTP_201_CREATED)
+
+
+from rest_framework.generics import ListAPIView
+class MyDislikedPostsView(ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(dislike__user=self.request.user).distinct()
+
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset=Post.objects.all()
@@ -86,14 +89,11 @@ class RegisterView(APIView):
         token = Token.objects.create(user=user)
         return Response({'token': token.key}, status=201)
     
-from .serializers import LoginSerializer
-from .serializers import RegisterSerializer
-from rest_framework.permissions import BasePermission
 class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self,request,view,obj):
         return obj.author == request.user or request.user.is_staff
 
-from .serializers import UserSerializer,CategorySerializer
+
 class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -132,6 +132,7 @@ class RegisterView(APIView):
             token = Token.objects.create(user=user)
             return Response({'token': token.key}, status=201)
         return Response(serializer.errors, status=400)
+    
 class CommentLikeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -140,7 +141,7 @@ class CommentLikeView(APIView):
         user = request.user
         like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
         if not created:
-            like.delete()  # Remove like if already liked
+            like.delete() 
             return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
         return Response({"message": "Comment liked."}, status=status.HTTP_201_CREATED)
 
@@ -153,7 +154,7 @@ class CommentDislikeView(APIView):
         CommentLike.objects.filter(user=user, comment=comment).delete()
         dislike, created = CommentDislike.objects.get_or_create(user=user, comment=comment)
         if not created:
-            dislike.delete()  # Remove dislike if already disliked
+            dislike.delete() 
             return Response({"message": "Dislike removed."}, status=status.HTTP_200_OK)
         return Response({"message": "Comment disliked."}, status=status.HTTP_201_CREATED)
 
@@ -169,6 +170,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
         post_id = self.kwargs['post_id']
         post = get_object_or_404(Post, id=post_id)
         serializer.save(user=self.request.user, post=post)
+
 class CommentReplyListView(generics.ListAPIView):
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
