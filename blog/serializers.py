@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from blog.models import Post,Category,Like,Dislike,Comment,CommentLike,CommentDislike
+from blog.models import Post,Category,Like,Dislike,Comment,CommentLike
 from django.contrib.auth.models import User
 from blog.models import Post
 
@@ -21,7 +21,14 @@ class PostSerializer(serializers.ModelSerializer):
     def get_dislike_count(self, obj):
         return Dislike.objects.filter(post=obj).count()
     def get_liked_by(self, obj):
-        return [like.user.username for like in Like.objects.filter(post=obj)]
+        # return [like.user.username for like in Like.objects.filter(post=obj)]
+        liked_users = []
+        for like in obj.likes.all():
+            if like.user:
+                liked_users.append(like.user.username)
+            elif like.session_key:
+                liked_users.append(f"Anonymous ({like.session_key[:6]})")
+        return liked_users
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,7 +40,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name']
-        
+
 class LoginSerializer(serializers.ModelSerializer):
         username = serializers.CharField()
         password=serializers.CharField(write_only=True)
@@ -58,19 +65,31 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
-    username = serializers.CharField(source='user.username', read_only=True)
+    username = serializers.SerializerMethodField()
     liked_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ['id', 'post', 'user', 'username', 'content', 'parent', 'created_at', 'replies', 'like_count','liked_by']
-
+        fields = ['id', 'post', 'user', 'username', 'content', 'parent', 'created_at', 'replies', 'like_count', 'liked_by']
+        read_only_fields = ['id', 'user', 'session_key', 'post', 'created_at']
+        extra_kwargs = {
+            'user': {'required': False, 'allow_null': True},
+            'session_key': {'required': False, 'allow_null': True},
+        }
+    
     def get_replies(self, obj):
-      replies = Comment.objects.filter(parent=obj).order_by('created_at')
-      return CommentSerializer(replies, many=True, context=self.context).data
+        replies = Comment.objects.filter(parent=obj).order_by('created_at')
+        return CommentSerializer(replies, many=True, context=self.context).data
 
     def get_like_count(self, obj):
         return CommentLike.objects.filter(comment=obj).count()
 
     def get_liked_by(self, obj):
-       return [like.user.username for like in CommentLike.objects.filter(comment=obj)]
+        return [like.user.username if like.user else f"Anonymous ({like.session_key[:6]})" for like in obj.likes.all()]
+
+    def get_username(self, obj):
+        if obj.user:
+            return obj.user.username
+        elif obj.session_key:
+            return f"anon_{obj.session_key[:6]}"
+        return "anonymous"
