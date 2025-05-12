@@ -196,13 +196,30 @@ class CommentListCreateView(generics.ListCreateAPIView):
     def get_queryset(self):
         post_id = self.kwargs['post_id']
         return Comment.objects.filter(post_id=post_id, parent=None).order_by('-created_at')
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from .models import Comment
+from .serializers import CommentSerializer
 
-class CommentReplyListView(generics.ListAPIView):
+class CommentReplyView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]
+
     def get_queryset(self):
         comment_id = self.kwargs['comment_id']
         return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
+
+    def perform_create(self, serializer):
+      parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
+      serializer.save(parent=parent_comment, post=parent_comment.post)
+
+
+# class CommentReplyView(generics.ListAPIView):
+#     serializer_class = CommentSerializer
+#     permission_classes = [AllowAny]
+#     def get_queryset(self):
+#         comment_id = self.kwargs['comment_id']
+#         return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
 
 class CommentDetailWithRepliesView(RetrieveAPIView):
     queryset = Comment.objects.all()
@@ -227,7 +244,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect('post_list_create_view')  # or home page
+            return redirect('post_list_create_view') 
     else:
         form = AuthenticationForm()
     return render(request, 'blog/login.html', {'form': form})
@@ -268,12 +285,25 @@ def user_list_view(request):
     users = User.objects.all()
     return render(request, 'blog/user_list_view.html', {'users': users})
 
+# @login_required
+# def post_detail_view(request, pk):
+#     post = get_object_or_404(Post, id=pk)
+#     return render(request, 'blog/post_detail.html', {'post': post})
 @login_required
 def post_detail_view(request, pk):
     post = get_object_or_404(Post, id=pk)
-    return render(request, 'blog/post_detail.html', {'post': post})
+    like_count = post.likes.count()
+    dislike_count = post.dislikes.count()
+    return render(request, 'blog/post_detail.html', {
+        'post': post,
+        'like_count': like_count,
+        'dislike_count': dislike_count,
+    })
 
 @login_required
 def category_list_view(request):
     categories = Category.objects.all()
     return render(request, 'blog/category_list_view.html', {'categories': categories})
+
+# def comment_list_create_view(request):
+
