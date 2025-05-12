@@ -15,13 +15,12 @@ class PostSerializer(serializers.ModelSerializer):
     liked_by = serializers.SerializerMethodField()
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by ']
+        fields = ['id', 'title', 'content', 'author', 'category', 'created_at', 'like_count', 'dislike_count', 'liked_by','comments']
     def get_like_count(self, obj):
         return Like.objects.filter(post=obj).count()
     def get_dislike_count(self, obj):
         return Dislike.objects.filter(post=obj).count()
     def get_liked_by(self, obj):
-        # return [like.user.username for like in Like.objects.filter(post=obj)]
         liked_users = []
         for like in obj.likes.all():
             if like.user:
@@ -39,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name','author']
 
 class LoginSerializer(serializers.ModelSerializer):
         username = serializers.CharField()

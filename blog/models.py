@@ -12,7 +12,7 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
-    author = models.ForeignKey(User,on_delete=models.CASCADE) 
+    author = models.ForeignKey(User,on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     created_at=models.DateTimeField(auto_now_add=True)
     def total_likes(self):

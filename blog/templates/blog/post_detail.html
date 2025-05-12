@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h2>{{ post.title }}</h2>
+  <p>{{ post.content }}</p>
+  <p><strong>Author:</strong> {{ post.author.username }}</p>
+  <p><strong>Category:</strong> {{ post.category.name }}</p>
+  <p><strong>Likes:</strong> {{ post.like_count }}</p>
+  <p><strong>Dislikes:</strong> {{ post.dislike_count }}</p>
+
+  <a href="{% url 'post_list_create_view' %}">Back to Post List</a>
+{% endblock %}

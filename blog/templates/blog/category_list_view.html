@@ -1,0 +1,10 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h1>Category List</h1>
+  <ul>
+    {% for category in categories %}
+      <li>{{ category.name }}</li>  <!-- Assuming each category has a 'name' field -->
+    {% endfor %}
+  </ul>
+{% endblock %}
