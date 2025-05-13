@@ -255,7 +255,6 @@ def login_view(request):
 
 
 def admin_login_view(request):
-    error = None
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -264,8 +263,8 @@ def admin_login_view(request):
             login(request, user)
             return redirect('/admin/')
         else:
-            error = "Invalid admin credentials"
-    return render(request, 'blog/admin_login.html', {'error': error})
+            return "Invalid admin credentials"
+    return render(request, 'blog/admin_login.html')
 
 
 from django.contrib.auth.decorators import login_required
@@ -475,15 +474,15 @@ def comment_detail_with_replies_view(request,pk):
 
 
 
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
-from django.views.generic import DeleteView
-from django.urls import reverse_lazy
-from .models import Post
-class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Post
-    template_name = 'blog/post_confirm_delete.html'
-    success_url = reverse_lazy('post_list_create_view') 
+# from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
+# from django.views.generic import DeleteView
+# from django.urls import reverse_lazy
+# from .models import Post
+# class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+#     model = Post
+#     template_name = 'blog/post_confirm_delete.html'
+#     success_url = reverse_lazy('post_list_create_view') 
 
-    def test_func(self):
-        post = self.get_object()
-        return self.request.user == post.author or self.request.user.is_staff
+#     def test_func(self):
+#         post = self.get_object()
+#         return self.request.user == post.author or self.request.user.is_staff

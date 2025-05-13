@@ -1,7 +1,7 @@
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import ( CommentListCreateView,post_like_view,post_dislike_view,my_disliked_posts_view,comment_replies_view, comment_detail_with_replies_view,register_view,login_view,admin_login_view,post_list_create_view,post_detail_view,user_list_view,category_list_view,PostDeleteView,comment_like_view,comment_dislike_view)
+from .views import ( CommentListCreateView,post_like_view,post_dislike_view,my_disliked_posts_view,comment_replies_view, comment_detail_with_replies_view,register_view,login_view,admin_login_view,post_list_create_view,post_detail_view,user_list_view,category_list_view,comment_like_view,comment_dislike_view)
 
 
 urlpatterns = [
@@ -22,7 +22,7 @@ urlpatterns = [
     path('comments/<int:comment_id>/like/', comment_like_view,name='comment-like'),#cmt like
     path('comments/<int:comment_id>/dislike/', comment_dislike_view,name='comment-dislike'),  # Dislike comment
     path('comments/<int:pk>/', comment_detail_with_replies_view,name='comment-detail'),#replies of a specific cmt pk......pending
-    path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),#delete here only auth admin
+    #path('posts/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),#delete here only auth admin
 
 
 
