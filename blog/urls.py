@@ -8,7 +8,7 @@ urlpatterns = [
     # path('posts/', PostListCreateView.as_view(), name='post-list-create'),  #crt post
     # path('posts/<int:pk>/', PostDetailView.as_view(), name='post-detail'),  #post view,edit,delete
     # path('register/', RegisterView.as_view(), name='register'),
-    # path('login/', LoginView.as_view(), name='login'),
+    #path('login/', LoginView.as_view(), name='login'),
     # path('users/', UserListView.as_view(), name='user-list'),
     # path('category/', CategoryListCreateView.as_view(), name='category-list'),
 

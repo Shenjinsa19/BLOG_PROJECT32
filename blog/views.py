@@ -219,7 +219,18 @@ from django.views import View
 #     def perform_create(self, serializer):
 #       parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
 #       serializer.save(parent=parent_comment, post=parent_comment.post)
+# from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
+# from django.views.generic import DeleteView
+# from django.urls import reverse_lazy
+# from .models import Post
+# class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+#     model = Post
+#     template_name = 'blog/post_confirm_delete.html'
+#     success_url = reverse_lazy('post_list_create_view') 
 
+#     def test_func(self):
+#         post = self.get_object()
+#         return self.request.user == post.author or self.request.user.is_staff
 
 
 
@@ -474,15 +485,3 @@ def comment_detail_with_replies_view(request,pk):
 
 
 
-# from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
-# from django.views.generic import DeleteView
-# from django.urls import reverse_lazy
-# from .models import Post
-# class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-#     model = Post
-#     template_name = 'blog/post_confirm_delete.html'
-#     success_url = reverse_lazy('post_list_create_view') 
-
-#     def test_func(self):
-#         post = self.get_object()
-#         return self.request.user == post.author or self.request.user.is_staff
