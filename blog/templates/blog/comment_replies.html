@@ -1,0 +1,30 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+  <h3>Reply to: "{{ parent_comment.content }}"</h3>
+
+  <ul>
+    {% for reply in replies %}
+      <li>
+        <strong>
+          {% if reply.user %}
+            {{ reply.user.username }}
+          {% else %}
+            Anonymous
+          {% endif %}
+        </strong>: {{ reply.content }}
+        <small>on {{ reply.created_at }}</small>
+      </li>
+    {% empty %}
+      <li>No replies yet.</li>
+    {% endfor %}
+  </ul>
+
+  <h4>Leave a reply</h4>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Reply</button>
+  </form>
+
+  <a href="{% url 'post_list_create_view' %}">Back to Posts</a>
+{% endblock %}

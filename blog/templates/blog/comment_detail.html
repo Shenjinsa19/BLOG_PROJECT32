@@ -1,0 +1,43 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h2>Comment Detail</h2>
+
+  <p>
+    <strong>
+      {% if comment.user %}
+        {{ comment.user.username }}
+      {% else %}
+        Anonymous
+      {% endif %}
+    </strong>: {{ comment.content }}
+  </p>
+
+  <p>Posted at: {{ comment.created_at }}</p>
+
+  <p>Likes: {{ comment.likes.count }}</p>
+  <p>Dislikes: {{ comment.dislikes.count }}</p>
+
+  <a href="{% url 'comment-like' comment.id %}"> Like</a>
+  <a href="{% url 'comment-dislike' comment.id %}"> Dislike</a>
+
+  <hr>
+  <h3>Replies</h3>
+  {% for reply in replies %}
+    <p>
+      <strong>
+        {% if reply.user %}
+          {{ reply.user.username }}
+        {% else %}
+          Anonymous
+        {% endif %}
+      </strong>: {{ reply.content }}
+    </p>
+    <p>{{ reply.created_at }}</p>
+    <hr>
+  {% empty %}
+    <p>No replies yet.</p>
+  {% endfor %}
+
+  <a href="{% url 'post-detail-view' comment.post.id %}">Back to Post</a>
+{% endblock %}

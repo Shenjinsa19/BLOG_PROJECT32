@@ -1,0 +1,16 @@
+
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h2>Like Comment</h2>
+  <p><strong>{{ comment.username }}</strong> said:</p>
+  <p>{{ comment.content }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit"> Like</button>
+  </form>
+
+  <a href="{% url 'post-detail-view' comment.post.id %}">Back to Post</a>
+{% endblock %}
+

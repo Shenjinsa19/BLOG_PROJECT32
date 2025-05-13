@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+  <h2>{{ post.title }}</h2>
+  <p>{{ post.content }}</p>
+  <p><strong>Author:</strong> {{ post.author.username }}</p>
+  <p><strong>Category:</strong> {{ post.category.name }}</p>
+
+  <h3>Comments</h3>
+  <ul>
+  {% for comment in comments %}
+    <li>
+      <p>{{ comment.content }}</p>
+      <p><small>By:
+        {% if comment.user %}
+          {{ comment.user.username }}
+        {% else %}
+          Anonymous
+        {% endif %}
+        on {{ comment.created_at }}</small></p>
+    </li>
+  {% empty %}
+    <li>No comments yet.</li>
+  {% endfor %}
+</ul>
+
+
+  <h4>Add a Comment</h4>
+  <form method="post">
+    {% csrf_token %}
+    <textarea name="content" required></textarea><br>
+    <button type="submit">Submit Comment</button>
+  </form>
+  
+
+  <a href="{% url 'comment-list-create' post.id %}">Back to Post</a>
+  
+  <a href="{% url 'replies' post.id %}">Comment</a>
+
+{% endblock %}

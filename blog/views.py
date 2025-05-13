@@ -16,63 +16,60 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView,ListAPIView,RetrieveAPIView
+from django.utils import timezone
+from django.views import View
 
-class LikePostView(APIView):
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
-        if request.user.is_authenticated:
-            like = Like.objects.filter(user=request.user, post=post).first()
-            if like:
-                like.delete()
-                return Response({"message": "Like removed"})
-            Dislike.objects.filter(user=request.user, post=post).delete()
-            Like.objects.create(user=request.user, post=post)
-            return Response({"message": "Post liked"})
-        else:
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            like = Like.objects.filter(session_key=session_key, post=post).first()
-            if like:
-                like.delete()
-                return Response({"message": "Like removed"})
-            Dislike.objects.filter(session_key=session_key, post=post).delete()
-            Like.objects.create(session_key=session_key, post=post)
-            return Response({"message": "Post liked anonymously"})
+# class LikePostView(APIView):
+#     def post(self, request, post_id):
+#         post = get_object_or_404(Post, id=post_id)
+#         if request.user.is_authenticated:
+#             like = Like.objects.filter(user=request.user, post=post).first()
+#             if like:
+#                 like.delete()
+#                 return Response({"message": "Like removed"})
+#             Dislike.objects.filter(user=request.user, post=post).delete()
+#             Like.objects.create(user=request.user, post=post)
+#             return Response({"message": "Post liked"})
+#         else:
+#             if not request.session.session_key:
+#                 request.session.create()
+#             session_key = request.session.session_key
+#             like = Like.objects.filter(session_key=session_key, post=post).first()
+#             if like:
+#                 like.delete()
+#                 return Response({"message": "Like removed"})
+#             Dislike.objects.filter(session_key=session_key, post=post).delete()
+#             Like.objects.create(session_key=session_key, post=post)
+#             return Response({"message": "Post liked anonymously"})
 
         
-class DislikePostView(APIView):
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+# class DislikePostView(APIView):
+#     def post(self, request, post_id):
+#         post = get_object_or_404(Post, id=post_id)
 
-        if request.user.is_authenticated:
-            dislike = Dislike.objects.filter(user=request.user, post=post).first()
-            if dislike:
-                dislike.delete()
-                return Response({"message": "Dislike removed"})
-            Like.objects.filter(user=request.user, post=post).delete()
-            Dislike.objects.create(user=request.user, post=post)
-            return Response({"message": "Post disliked"})
-        else:
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            dislike = Dislike.objects.filter(session_key=session_key, post=post).first()
-            if dislike:
-                dislike.delete()
-                return Response({"message": "Dislike removed"})
-            Like.objects.filter(session_key=session_key, post=post).delete()
-            Dislike.objects.create(session_key=session_key, post=post)
-            return Response({"message": "Post disliked anonymously"})
+#         if request.user.is_authenticated:
+#             dislike = Dislike.objects.filter(user=request.user, post=post).first()
+#             if dislike:
+#                 dislike.delete()
+#                 return Response({"message": "Dislike removed"})
+#             Like.objects.filter(user=request.user, post=post).delete()
+#             Dislike.objects.create(user=request.user, post=post)
+#             return Response({"message": "Post disliked"})
+#         else:
+#             if not request.session.session_key:
+#                 request.session.create()
+#             session_key = request.session.session_key
+#             dislike = Dislike.objects.filter(session_key=session_key, post=post).first()
+#             if dislike:
+#                 dislike.delete()
+#                 return Response({"message": "Dislike removed"})
+#             Like.objects.filter(session_key=session_key, post=post).delete()
+#             Dislike.objects.create(session_key=session_key, post=post)
+#             return Response({"message": "Post disliked anonymously"})
+
+
+
   
-
-class MyDislikedPostsView(ListAPIView):
-    serializer_class = PostSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Post.objects.filter(dislike__user=self.request.user).distinct()
-
 
 
 # class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -97,9 +94,9 @@ class MyDislikedPostsView(ListAPIView):
 #         token = Token.objects.create(user=user)
 #         return Response({'token': token.key}, status=201)
     
-class IsOwnerOrAdmin(BasePermission):
-    def has_object_permission(self,request,view,obj):
-        return obj.author == request.user or request.user.is_staff
+# class IsOwnerOrAdmin(BasePermission):
+#     def has_object_permission(self,request,view,obj):
+#         return obj.author == request.user or request.user.is_staff
 
 
 # class UserListView(generics.ListAPIView):
@@ -112,119 +109,125 @@ class IsOwnerOrAdmin(BasePermission):
 #     serializer_class = CategorySerializer
 #     permission_classes = [IsAuthenticatedOrReadOnly]
 
-class LoginView(APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
-            user = authenticate(username=username, password=password)
-            if user:
-                token, created = Token.objects.get_or_create(user=user)
-                return Response({'token': token.key})
-            return Response({'error': 'Invalid credentials'}, status=400)
-        return Response(serializer.errors, status=400)
+# class LoginView(APIView):
+#     def post(self, request):
+#         serializer = LoginSerializer(data=request.data)
+#         if serializer.is_valid():
+#             username = serializer.validated_data['username']
+#             password = serializer.validated_data['password']
+#             user = authenticate(username=username, password=password)
+#             if user:
+#                 token, created = Token.objects.get_or_create(user=user)
+#                 return Response({'token': token.key})
+#             return Response({'error': 'Invalid credentials'}, status=400)
+#         return Response(serializer.errors, status=400)
     
-class RegisterView(APIView):
-    def post(self,request):
-        serializer=RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            username=serializer.validated_data['username']
-            email=serializer.validated_data['email']
-            password=serializer.validated_data['password']
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password
-            )   
-            token = Token.objects.create(user=user)
-            return Response({'token': token.key}, status=201)
-        return Response(serializer.errors, status=400)
+# class RegisterView(APIView):
+#     def post(self,request):
+#         serializer=RegisterSerializer(data=request.data)
+#         if serializer.is_valid():
+#             username=serializer.validated_data['username']
+#             email=serializer.validated_data['email']
+#             password=serializer.validated_data['password']
+#             user = User.objects.create_user(
+#                 username=username,
+#                 email=email,
+#                 password=password
+#             )   
+#             token = Token.objects.create(user=user)
+#             return Response({'token': token.key}, status=201)
+#         return Response(serializer.errors, status=400)
     
-class CommentLikeView(APIView):
-    permission_classes = [AllowAny]
-    def post(self, request, comment_id):
-        comment = get_object_or_404(Comment, id=comment_id)
-        if request.user.is_authenticated:
-            user = request.user
-            like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
-        else:
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            like, created = CommentLike.objects.get_or_create(session_key=session_key, comment=comment)
-        if not created:
-            like.delete()
-            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
-        return Response({"message": "Comment liked."}, status=status.HTTP_201_CREATED)
+# class CommentLikeView(APIView):
+#     permission_classes = [AllowAny]
+#     def post(self, request, comment_id):
+#         comment = get_object_or_404(Comment, id=comment_id)
+#         if request.user.is_authenticated:
+#             user = request.user
+#             like, created = CommentLike.objects.get_or_create(user=user, comment=comment)
+#         else:
+#             if not request.session.session_key:
+#                 request.session.create()
+#             session_key = request.session.session_key
+#             like, created = CommentLike.objects.get_or_create(session_key=session_key, comment=comment)
+#         if not created:
+#             like.delete()
+#             return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
 
 
-class CommentDislikeView(APIView):
-    permission_classes = [AllowAny]
 
-    def post(self, request, comment_id):
-        comment = get_object_or_404(Comment, id=comment_id)
+# class CommentDislikeView(APIView):
+#     permission_classes = [AllowAny]
 
-        if request.user.is_authenticated:
-            user = request.user
-            dislike, created = CommentLike.objects.get_or_create(user=user, comment=comment)
-        else:
-            if not request.session.session_key:
-                request.session.create()
-            session_key = request.session.session_key
-            dislike, created = CommentLike.objects.get_or_create(session_key=session_key, comment=comment)
+#     def post(self, request, comment_id):
+#         comment = get_object_or_404(Comment, id=comment_id)
 
-        if not created:
-            dislike.delete()
-            return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
-        return Response({"message": "Comment disliked."}, status=status.HTTP_201_CREATED)
+#         if request.user.is_authenticated:
+#             user = request.user
+#             dislike, created = CommentLike.objects.get_or_create(user=user, comment=comment)
+#         else:
+#             if not request.session.session_key:
+#                 request.session.create()
+#             session_key = request.session.session_key
+#             dislike, created = CommentLike.objects.get_or_create(session_key=session_key, comment=comment)
 
-    
-class CommentListCreateView(generics.ListCreateAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [AllowAny]
-    def perform_create(self, serializer):
-        post_id = self.kwargs['post_id']
-        post = get_object_or_404(Post,id=post_id)
-        if self.request.user.is_authenticated:
-            serializer.save(user=self.request.user, post=post)
-        else:
-            if not self.request.session.session_key:
-                self.request.session.create()
-            session_key = self.request.session.session_key
-            serializer.save(user=None, session_key=session_key, post=post)
-    def get_queryset(self):
-        post_id = self.kwargs['post_id']
-        return Comment.objects.filter(post_id=post_id, parent=None).order_by('-created_at')
-from rest_framework import generics
-from rest_framework.permissions import AllowAny
-from .models import Comment
-from .serializers import CommentSerializer
-
-class CommentReplyView(generics.ListCreateAPIView):
-    serializer_class = CommentSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        comment_id = self.kwargs['comment_id']
-        return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
-
-    def perform_create(self, serializer):
-      parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
-      serializer.save(parent=parent_comment, post=parent_comment.post)
+#         if not created:
+#             dislike.delete()
+#             return Response({"message": "Like removed."}, status=status.HTTP_200_OK)
+#         return Response({"message": "Comment disliked."}, status=status.HTTP_201_CREATED)
 
 
-# class CommentReplyView(generics.ListAPIView):
+
+
+
+
+
+# class CommentListCreateView(generics.ListCreateAPIView):
 #     serializer_class = CommentSerializer
 #     permission_classes = [AllowAny]
+#     def perform_create(self, serializer):
+#         post_id = self.kwargs['post_id']
+#         post = get_object_or_404(Post,id=post_id)
+#         if self.request.user.is_authenticated:
+#             serializer.save(user=self.request.user, post=post)
+#         else:
+#             if not self.request.session.session_key:
+#                 self.request.session.create()
+#             session_key = self.request.session.session_key
+#             serializer.save(user=None, session_key=session_key, post=post)
+#     def get_queryset(self):
+#         post_id = self.kwargs['post_id']
+#         return Comment.objects.filter(post_id=post_id, parent=None).order_by('-created_at')
+#     def get(self, request, *args, **kwargs):
+#         post_id = self.kwargs['post_id']
+#         post = get_object_or_404(Post, id=post_id)
+#         comments = self.get_queryset()
+#         return render(request, 'blog/comment_list_create.html', {
+#             'post': post,
+#             'comments': comments
+#         })
+
+
+# class CommentReplyView(generics.ListCreateAPIView):
+#     serializer_class = CommentSerializer
+#     permission_classes = [AllowAny]
+
 #     def get_queryset(self):
 #         comment_id = self.kwargs['comment_id']
 #         return Comment.objects.filter(parent_id=comment_id).order_by('created_at')
 
-class CommentDetailWithRepliesView(RetrieveAPIView):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+#     def perform_create(self, serializer):
+#       parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
+#       serializer.save(parent=parent_comment, post=parent_comment.post)
+
+
+
+
+
+# class CommentDetailWithRepliesView(RetrieveAPIView):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login as auth_login, authenticate
@@ -238,6 +241,7 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'blog/register.html', {'form': form})
 
+
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -249,7 +253,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'blog/login.html', {'form': form})
 
-from django.contrib.auth.decorators import user_passes_test
+
 def admin_login_view(request):
     error = None
     if request.method == "POST":
@@ -262,6 +266,7 @@ def admin_login_view(request):
         else:
             error = "Invalid admin credentials"
     return render(request, 'blog/admin_login.html', {'error': error})
+
 
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
@@ -278,32 +283,207 @@ def post_list_create_view(request):
             return redirect('post_list_create_view')
     else:
         form = PostForm()
-
     return render(request, 'blog/post_list_create_view.html', {'posts': posts, 'form': form})
 
-def user_list_view(request):
-    users = User.objects.all()
-    return render(request, 'blog/user_list_view.html', {'users': users})
 
-# @login_required
-# def post_detail_view(request, pk):
-#     post = get_object_or_404(Post, id=pk)
-#     return render(request, 'blog/post_detail.html', {'post': post})
 @login_required
 def post_detail_view(request, pk):
     post = get_object_or_404(Post, id=pk)
     like_count = post.likes.count()
     dislike_count = post.dislikes.count()
+    comments=post.comments.all
     return render(request, 'blog/post_detail.html', {
         'post': post,
         'like_count': like_count,
         'dislike_count': dislike_count,
-    })
+        'comments':comments,
+
+    })                      
+
+
+def user_list_view(request):
+    users = User.objects.all()                    #just any anons etc...
+    return render(request, 'blog/user_list_view.html', {'users': users})
+
 
 @login_required
-def category_list_view(request):
+def category_list_view(request):                #user specific
     categories = Category.objects.all()
     return render(request, 'blog/category_list_view.html', {'categories': categories})
 
-# def comment_list_create_view(request):
+      
+@login_required
+def my_disliked_posts_view(request):             #user specifi
+    disliked_posts = Post.objects.filter(dislikes__user=request.user).distinct()
+    return render(request, 'blog/my_disliked_posts.html', {'posts': disliked_posts})
 
+
+def post_like_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            like = Like.objects.filter(user=request.user, post=post).first()
+            if like:
+                like.delete()
+            else:
+                Dislike.objects.filter(user=request.user, post=post).delete()
+                Like.objects.create(user=request.user, post=post)
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            like = Like.objects.filter(session_key=session_key, post=post).first()
+            if like:
+                like.delete()
+            else:
+                Dislike.objects.filter(session_key=session_key, post=post).delete()
+                Like.objects.create(session_key=session_key, post=post)
+        return redirect('post-detail-view', pk=post_id)
+    return render(request, 'blog/like_post.html', {'post': post})
+
+
+def post_dislike_view(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            dislike = Dislike.objects.filter(user=request.user, post=post).first()
+            if dislike:
+                dislike.delete()
+            else:
+                Like.objects.filter(user=request.user, post=post).delete()
+                Dislike.objects.create(user=request.user, post=post)
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            dislike = Dislike.objects.filter(session_key=session_key, post=post).first()
+            if dislike:
+                dislike.delete()
+            else:
+                Like.objects.filter(session_key=session_key, post=post).delete()
+                Dislike.objects.create(session_key=session_key, post=post)
+        return redirect('post-detail-view', pk=post_id)
+    return render(request, 'blog/dislike_post.html', {'post': post})
+
+
+class CommentListCreateView(View):
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        comments = Comment.objects.filter(post_id=post_id, parent=None).order_by('-created_at')
+        return render(request, 'blog/comment_list_create.html', {
+            'post': post,
+            'comments': comments
+        })
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        content = request.POST.get('content')
+
+        if not content:
+            return redirect('comment-list-create', post_id=post.id)
+
+        if request.user.is_authenticated:
+            Comment.objects.create(
+                user=request.user,
+                post=post,
+                content=content,
+                created_at=timezone.now()
+            )
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            Comment.objects.create(
+                session_key=session_key,
+                user=None,
+                post=post,
+                content=content,
+                created_at=timezone.now()
+            )
+        return redirect('comment-list-create', post_id=post.id)
+    
+
+def comment_like_view(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            like, created = CommentLike.objects.get_or_create(user=request.user, comment=comment)
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            like, created = CommentLike.objects.get_or_create(session_key=session_key, comment=comment)
+        if not created:
+            like.delete()
+        return redirect('post-detail-view', pk=comment.post.id)
+    return render(request, 'blog/comment_like.html', {'comment': comment})
+
+
+def comment_dislike_view(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.method == 'POST':
+        if request.user.is_authenticated:
+            dislike, created = CommentDislike.objects.get_or_create(user=request.user, comment=comment)
+        else:
+            if not request.session.session_key:
+                request.session.create()
+            session_key = request.session.session_key
+            dislike, created = CommentDislike.objects.get_or_create(session_key=session_key, comment=comment)
+        if not created:
+            dislike.delete()
+        return redirect('post-detail-view', pk=comment.post.id)
+    return render(request, 'blog/comment_dislike.html', {'comment': comment})
+
+
+from .forms import CommentForm 
+def comment_replies_view(request, comment_id):
+    parent_comment = get_object_or_404(Comment, id=comment_id)
+    replies = Comment.objects.filter(parent=parent_comment).order_by('created_at')
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.parent = parent_comment
+            reply.post = parent_comment.post
+            if request.user.is_authenticated:
+                reply.user = request.user
+            else:
+                if not request.session.session_key:
+                    request.session.create()
+                reply.session_key = request.session.session_key
+            reply.save()
+            return redirect('replies', comment_id=comment_id)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/comment_replies.html', {
+        'parent_comment':parent_comment,
+        'replies':replies,
+        'form':form,
+    })
+
+
+
+@login_required
+def comment_detail_with_replies_view(request,pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    replies = comment.replies.all()  
+    return render(request, 'blog/comment_detail.html', {
+        'comment':comment,
+        'replies':replies
+    })
+
+
+
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
+from django.views.generic import DeleteView
+from django.urls import reverse_lazy
+from .models import Post
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('post_list_create_view') 
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_staff

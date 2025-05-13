@@ -15,14 +15,7 @@ class Post(models.Model):
     author = models.ForeignKey(User,on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts')
     created_at=models.DateTimeField(auto_now_add=True)
-    
-    # def total_likes(self):
-    #     return self.likes.count()
-    # class Meta:
-    #     verbose_name = "Post"       
-    #     verbose_name_plural = "Post"
-    # def __str__(self):
-    #     return self.title
+   
     def __str__(self):
         return self.title
 

@@ -9,18 +9,35 @@
   <p><strong>Likes:</strong> {{ like_count }}</p>
   <p><strong>Dislikes:</strong> {{ dislike_count }}</p>
 
+  <a href="{% url 'like-post' post.id %}"> Like</a>
+  <a href="{% url 'dislike-post' post.id %}"> Dislike</a>
+  <a href="{% url 'comment-list-create' post.id %}">Comment</a>
 
 
-  <form method="post" action="{% url 'like-post' post.id %}">
-    {% csrf_token %}
-    <button type="submit">Like</button>
-  </form>
+  <hr>
+  <h3>Comments</h3>
+
+  {% for comment in comments %}
+  <p>
+    <strong>
+      {% if comment.user %}
+        {{ comment.user.username }}
+      {% else %}
+        Anonymous
+      {% endif %}
+    </strong>: {{ comment.content }}
+  </p>
+  <p>{{ comment.created_at }}</p>
 
 
-  <form method="post" action="{% url 'dislike-post' post.id %}">
-    {% csrf_token %}
-    <button type="submit">Dislike</button>
-  </form>
+    <a href="{% url 'comment-like' comment.id %}"> Like ({{ comment.likes.count }})</a>
+    <a href="{% url 'comment-dislike' comment.id %}"> Dislike ({{ comment.dislikes.count }})</a>
+    
+
+    <hr>
+  {% empty %}
+    <p>No comments yet.</p>
+  {% endfor %}
 
   <a href="{% url 'post_list_create_view' %}">Back to Post List</a>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h1>My Disliked Posts</h1>
+  
+  {% if posts %}
+    <ul>
+      {% for post in posts %}
+        <li>
+          <h3>{{ post.title }}</h3>
+          <p>{{ post.content }}</p>
+          <p><strong>Author:</strong> {{ post.author.username }}</p>
+          <p><strong>Category:</strong> {{ post.category.name }}</p>
+          <p><strong>Likes:</strong> {{ post.like_count }}</p>
+          <p><strong>Dislikes:</strong> {{ post.dislike_count }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You haven't disliked any posts yet.</p>
+  {% endif %}
+{% endblock %}
