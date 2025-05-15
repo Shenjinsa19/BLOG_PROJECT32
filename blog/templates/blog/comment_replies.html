@@ -1,30 +1,47 @@
 {% extends 'blog/base.html' %}
+
+{% block title %}Replies{% endblock %}
+
 {% block content %}
-  <h3>Reply to: "{{ parent_comment.content }}"</h3>
+  <div class="main-content">
 
-  <ul>
-    {% for reply in replies %}
-      <li>
-        <strong>
-          {% if reply.user %}
-            {{ reply.user.username }}
-          {% else %}
-            Anonymous
-          {% endif %}
-        </strong>: {{ reply.content }}
-        <small>on {{ reply.created_at }}</small>
-      </li>
-    {% empty %}
-      <li>No replies yet.</li>
-    {% endfor %}
-  </ul>
+    <div class="reply-card">
+      <h3>Reply to:</h3>
+      <blockquote>"{{ parent_comment.content }}"</blockquote>
+    </div>
 
-  <h4>Leave a reply</h4>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Reply</button>
-  </form>
+    <div class="replies-section">
+      <h4>Replies</h4>
+      <ul class="reply-list">
+        {% for reply in replies %}
+          <li class="reply">
+            <p><strong>
+              {% if reply.user %}
+                {{ reply.user.username }}
+              {% else %}
+                Anonymous
+              {% endif %}
+            </strong>: {{ reply.content }}</p>
+            <p class="meta"><small>on {{ reply.created_at }}</small></p>
+          </li>
+        {% empty %}
+          <li>No replies yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
 
-  <a href="{% url 'post_list_create_view' %}">Back to Posts</a>
+    <div class="reply-form">
+      <h4>Leave a Reply</h4>
+      <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Reply</button>
+      </form>
+    </div>
+
+    <div class="nav-links">
+      <a href="{% url 'post_list_create_view' %}" class="btn-link">Back to Posts</a>
+    </div>
+
+  </div>
 {% endblock %}

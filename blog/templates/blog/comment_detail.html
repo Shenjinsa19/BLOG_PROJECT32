@@ -1,43 +1,52 @@
 {% extends 'blog/base.html' %}
 
+{% block title %}Comment Details{% endblock %}
+
 {% block content %}
-  <h2>Comment Details</h2>
+  <div class="comment-detail-container">
+    <h2>Comment Details</h2>
 
-  <p>
-    <strong>
-      {% if comment.user %}
-        {{ comment.user.username }}
-      {% else %}
-        Anonymous
-      {% endif %}
-    </strong>: {{ comment.content }}
-  </p>
+    <div class="comment-box">
+      <p>
+        <strong>
+          {% if comment.user %}
+            {{ comment.user.username }}
+          {% else %}
+            Anonymous
+          {% endif %}
+        </strong>: {{ comment.content }}
+      </p>
+      <p><small>Posted at: {{ comment.created_at }}</small></p>
+      <p>Likes: {{ comment.likes.count }}</p>
+      <p>Dislikes: {{ comment.dislikes.count }}</p>
+    </div>
 
-  <p>Posted at: {{ comment.created_at }}</p>
+    <div class="comment-actions">
+      <a href="{% url 'comment-like' comment.id %}" class="btn">Like</a>
+      <a href="{% url 'comment-dislike' comment.id %}" class="btn">Dislike</a>
+    </div>
 
-  <p>Likes: {{ comment.likes.count }}</p>
-  <p>Dislikes: {{ comment.dislikes.count }}</p>
-
-  <a href="{% url 'comment-like' comment.id %}"> Like</a>
-  <a href="{% url 'comment-dislike' comment.id %}"> Dislike</a>
-
-  <hr>
-  <h3>Replies</h3>
-  {% for reply in replies %}
-    <p>
-      <strong>
-        {% if reply.user %}
-          {{ reply.user.username }}
-        {% else %}
-          Anonymous
-        {% endif %}
-      </strong>: {{ reply.content }}
-    </p>
-    <p>{{ reply.created_at }}</p>
     <hr>
-  {% empty %}
-    <p>No replies yet.</p>
-  {% endfor %}
 
-  <a href="{% url 'post-detail-view' comment.post.id %}">Back to Post</a>
+    <h3>Replies</h3>
+    {% for reply in replies %}
+      <div class="reply-box">
+        <p>
+          <strong>
+            {% if reply.user %}
+              {{ reply.user.username }}
+            {% else %}
+              Anonymous
+            {% endif %}
+          </strong>: {{ reply.content }}
+        </p>
+        <p><small>{{ reply.created_at }}</small></p>
+      </div>
+      <hr>
+    {% empty %}
+      <p>No replies yet.</p>
+    {% endfor %}
+
+    <a href="{% url 'post-detail-view' comment.post.id %}" class="back-link">Back to Post</a>
+  </div>
 {% endblock %}

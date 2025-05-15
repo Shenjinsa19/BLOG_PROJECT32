@@ -1,13 +1,15 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-  <h2>Like Post</h2>
-  <p>Do you want to like this post titled <strong>{{ post.title }}</strong>?</p>
+<div class="like-post-container">
+    <h2 class="like-post-title">Like Post</h2>
+    <p>Do you want to like this post titled <strong>{{ post.title }}</strong>?</p>
 
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Like</button>
-  </form>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="like-post-button">Like</button>
+    </form>
 
-  <a href="{% url 'post-detail-view' post.id %}">Back to Post</a>
+    <a href="{% url 'post-detail-view' post.id %}" class="back-to-post">Back to Post</a>
+</div>
 {% endblock %}

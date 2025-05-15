@@ -1,0 +1,20 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+  <h2>Posts in "{{ category.name }}"</h2>
+
+  {% for post in posts %}
+    <div style="margin-bottom: 30px;">
+      <h3>{{ post.title }}</h3>
+      <p><strong>Author:</strong> {{ post.author.username }} | <strong>Posted on:</strong> {{ post.created_at|date:"F j, Y" }}</p>
+      <p>{{ post.content|truncatechars:200 }}</p>
+      <a href="{% url 'post-detail-view' post.id %}">Read more</a>
+    </div>
+    <hr>
+  {% empty %}
+    <p>No posts in this category.</p>
+  {% endfor %}
+
+  <br>
+  <a href="{% url 'category-list' %}">← Back to Categories</a>
+{% endblock %}

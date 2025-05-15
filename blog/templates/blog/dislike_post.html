@@ -1,13 +1,16 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-  <h2>DisLike Post</h2>
-  <p>Do you want to like this post titled <strong>{{ post.title }}</strong>?</p>
+<div class="dislike-post-container">
+    <h2 class="dislike-post-title">Dislike Post</h2>
+    <p>Do you want to dislike the post titled <strong>{{ post.title }}</strong>?</p>
 
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">DisLike</button>
-  </form>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="dislike-post-button">Dislike</button>
+    </form>
 
-  <a href="{% url 'post-detail-view' post.id %}">Back to Post</a>
+    <a href="{% url 'post-detail-view' post.id %}" class="back-to-post">Back to Post</a>
+</div>
 {% endblock %}
+

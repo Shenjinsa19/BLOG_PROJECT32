@@ -1,16 +1,28 @@
-
 {% extends 'blog/base.html' %}
 
+{% block title %}Like Comment{% endblock %}
+
 {% block content %}
+<div class="main-content">
   <h2>Like Comment</h2>
-  <p><strong>{{ comment.user }}</strong> commented:</p>
-  <p>{{ comment.content }}</p>
+  
+  <p><strong>
+    {% if comment.user %}
+      {{ comment.user.username }}
+    {% else %}
+      Anonymous
+    {% endif %}
+  </strong> commented:</p>
+
+  <blockquote class="comment-box">
+    {{ comment.content }}
+  </blockquote>
 
   <form method="post">
     {% csrf_token %}
-    <button type="submit"> Like</button>
+    <button type="submit" class="btn">Like</button>
   </form>
 
-  <a href="{% url 'post-detail-view' comment.post.id %}">Back to Post</a>
+  <a href="{% url 'post-detail-view' comment.post.id %}" class="back-link">Back to Post</a>
+</div>
 {% endblock %}
-

@@ -1,14 +1,28 @@
 {% extends 'blog/base.html' %}
 
+{% block title %}Dislike Comment{% endblock %}
+
 {% block content %}
+<div class="main-content">
   <h2>Dislike Comment</h2>
-  <p><strong>{{ comment.username }}</strong> said:</p>
-  <p>{{ comment.content }}</p>
+  
+  <p><strong>
+    {% if comment.user %}
+      {{ comment.user.username }}
+    {% else %}
+      Anonymous
+    {% endif %}
+  </strong> said:</p>
+
+  <blockquote class="comment-box">
+    {{ comment.content }}
+  </blockquote>
 
   <form method="post">
     {% csrf_token %}
-    <button type="submit"> Dislike</button>
+    <button type="submit" class="btn">Dislike</button>
   </form>
 
-  <a href="{% url 'post-detail-view' comment.post.id %}">Back to Post</a>
+  <a href="{% url 'post-detail-view' comment.post.id %}" class="back-link">Back to Post</a>
+</div>
 {% endblock %}

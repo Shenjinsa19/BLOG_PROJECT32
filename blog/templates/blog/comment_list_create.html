@@ -1,39 +1,49 @@
 {% extends 'blog/base.html' %}
+
+{% block title %}Comments - {{ post.title }}{% endblock %}
+
 {% block content %}
-  <h2>{{ post.title }}</h2>
-  <p>{{ post.content }}</p>
-  <p><strong>Author:</strong> {{ post.author.username }}</p>
-  <p><strong>Category:</strong> {{ post.category.name }}</p>
+  <div class="main-content">
+    <div class="post-card">
+      <h2>{{ post.title }}</h2>
+      <p>{{ post.content }}</p>
+      <p><strong>Author:</strong> {{ post.author.username }}</p>
+      <p><strong>Category:</strong> {{ post.category.name }}</p>
+    </div>
 
-  <h3>Comments</h3>
-  <ul>
-  {% for comment in comments %}
-    <li>
-      <p>{{ comment.content }}</p>
-      <p><small>By:
-        {% if comment.user %}
-          {{ comment.user.username }}
-        {% else %}
-          Anonymous
-        {% endif %}
-        on {{ comment.created_at }}</small></p>
-    </li>
-  {% empty %}
-    <li>No comments yet.</li>
-  {% endfor %}
-</ul>
+    <div class="comment-section">
+      <h3>Comments</h3>
+      {% if comments %}
+        <ul class="comment-list">
+          {% for comment in comments %}
+            <li class="comment">
+              <p>{{ comment.content }}</p>
+              <p class="meta">
+                <small>
+                  By: {% if comment.user %}{{ comment.user.username }}{% else %}Anonymous{% endif %}
+                  on {{ comment.created_at }}
+                </small>
+              </p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No comments yet.</p>
+      {% endif %}
+    </div>
 
+    <div class="add-comment-form">
+      <h4>Add a Comment</h4>
+      <form method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Submit Comment</button>
+      </form>
+    </div>
 
-  <h4>Add a Comment</h4>
-  <form method="post">
-    {% csrf_token %}
-    <textarea name="content" required></textarea><br>
-    <button type="submit">Submit Comment</button>
-  </form>
-  
-
-  <a href="{% url 'comment-list-create' post.id %}">Back to Post</a>
-  
-  <a href="{% url 'replies' post.id %}">Comment</a>
-
+    <div class="nav-links">
+      <a href="{% url 'post-detail-view' post.id %}" class="btn-link">Back to Post</a>
+      <a href="{% url 'replies' post.id %}" class="btn-link">View Replies</a>
+    </div>
+  </div>
 {% endblock %}

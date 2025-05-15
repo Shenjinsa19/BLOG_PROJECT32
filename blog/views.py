@@ -18,6 +18,9 @@ from rest_framework.response import Response
 from rest_framework.generics import RetrieveAPIView,ListAPIView,RetrieveAPIView
 from django.utils import timezone
 from django.views import View
+from django.http import HttpResponse
+
+
 
 # class LikePostView(APIView):
 #     def post(self, request, post_id):
@@ -219,18 +222,18 @@ from django.views import View
 #     def perform_create(self, serializer):
 #       parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
 #       serializer.save(parent=parent_comment, post=parent_comment.post)
-# from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
-# from django.views.generic import DeleteView
-# from django.urls import reverse_lazy
-# from .models import Post
-# class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-#     model = Post
-#     template_name = 'blog/post_confirm_delete.html'
-#     success_url = reverse_lazy('post_list_create_view') 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
+from django.views.generic import DeleteView
+from django.urls import reverse_lazy
+from .models import Post
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = reverse_lazy('post_list_create_view') 
 
-#     def test_func(self):
-#         post = self.get_object()
-#         return self.request.user == post.author or self.request.user.is_staff
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author or self.request.user.is_staff
 
 
 
@@ -240,16 +243,17 @@ from django.views import View
 #     serializer_class = CommentSerializer
 #     permission_classes = [IsAuthenticatedOrReadOnly]
 
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import  AuthenticationForm
+from .forms import CustomUserCreationForm
 from django.contrib.auth import login as auth_login, authenticate
 def register_view(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             return redirect('login')  
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'blog/register.html', {'form': form})
 
 
@@ -481,6 +485,18 @@ def comment_detail_with_replies_view(request,pk):
     return render(request, 'blog/comment_detail.html', {
         'comment':comment,
         'replies':replies
+    })
+
+
+
+
+@login_required
+def posts_by_category_view(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    posts = Post.objects.filter(category=category)
+    return render(request, 'blog/posts_by_category.html', {
+        'category': category,
+        'posts': posts
     })
 
 

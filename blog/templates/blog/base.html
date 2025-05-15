@@ -1,17 +1,27 @@
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}My Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'blog/style.css' %}">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'login' %}">Login</a> |
-        <a href="{% url 'register' %}">Register</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'post_list_create_view' %}" class="nav-logo">My Blog</a>
+            <div class="nav-links">
+                <a class="nav-links-login" href="{% url 'login' %}">Login</a>
+                <a class="nav-links-register" href="{% url 'register' %}">Register</a>
+            </div>
+        </div>
     </nav>
-    <hr>
-    {% block content %}
-    {% endblock %}
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
 </body>
 </html>
+
