@@ -1,14 +1,19 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-<div class="category-list-container">
-  <h1 class="category-title">Category List</h1>
-  <ul class="category-list">
+<div class="category-list-container" style="max-width: 600px; margin: 40px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+  <h1 class="category-title" style="text-align: center; color: #0066cc; margin-bottom: 30px;">Category List</h1>
+  
+  <ul class="category-list" style="list-style: none; padding: 0;">
     {% for category in categories %}
-      <li class="category-item">{{ category.name }}</li>
+      <li class="category-item" style="background-color: #f0f8ff; margin-bottom: 10px; padding: 12px 18px; border-radius: 8px; font-size: 18px; color: #004080; cursor: pointer; transition: background-color 0.3s ease;">
+        {{ category.name }}
+      </li>
     {% empty %}
-      <li class="category-item">No categories available.</li>
+      <li class="category-item" style="color: #888; font-style: italic;">No categories available.</li>
     {% endfor %}
   </ul>
+
 </div>
 {% endblock %}

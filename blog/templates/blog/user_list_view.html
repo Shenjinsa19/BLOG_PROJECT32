@@ -3,17 +3,30 @@
 {% block title %}User List{% endblock %}
 
 {% block content %}
-  <div class="main-content">
-    <h2>User List</h2>
-    <ul class="user-list">
+<div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 30px;">
+  <h2 style="font-size: 28px; color: #2c3e50; margin-bottom: 20px;">All Registered Users</h2>
+
+  {% if users %}
+    <ul class="user-list" style="list-style: none; padding: 0;">
       {% for user in users %}
-        <li class="user-item">
-          <span class="user-name">{{ user.username }}</span>
-          <span class="user-id">(ID: {{ user.id }})</span>
+        <li class="user-item" style="
+          padding: 12px 20px;
+          margin-bottom: 10px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          background-color: #f9f9f9;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+      
+        ">
+          <span class="user-name" style="font-weight: bold; color: #34495e;">{{ user.username }}</span>
+          <span class="user-id" style="color: #888;">ID: {{ user.id }}</span>
         </li>
-      {% empty %}
-        <li>No users found.</li>
       {% endfor %}
     </ul>
-  </div>
+  {% else %}
+    <p style="color: #999;">No users found.</p>
+  {% endif %}
+</div>
 {% endblock %}

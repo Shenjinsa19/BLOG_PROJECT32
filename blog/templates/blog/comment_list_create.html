@@ -3,47 +3,53 @@
 {% block title %}Comments - {{ post.title }}{% endblock %}
 
 {% block content %}
-  <div class="main-content">
-    <div class="post-card">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.content }}</p>
-      <p><strong>Author:</strong> {{ post.author.username }}</p>
-      <p><strong>Category:</strong> {{ post.category.name }}</p>
-    </div>
-
-    <div class="comment-section">
-      <h3>Comments</h3>
-      {% if comments %}
-        <ul class="comment-list">
-          {% for comment in comments %}
-            <li class="comment">
-              <p>{{ comment.content }}</p>
-              <p class="meta">
-                <small>
-                  By: {% if comment.user %}{{ comment.user.username }}{% else %}Anonymous{% endif %}
-                  on {{ comment.created_at }}
-                </small>
-              </p>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p>No comments yet.</p>
-      {% endif %}
-    </div>
-
-    <div class="add-comment-form">
-      <h4>Add a Comment</h4>
-      <form method="post">
-        {% csrf_token %}
-        <textarea name="content" rows="4" cols="50" required></textarea><br>
-        <button type="submit">Submit Comment</button>
-      </form>
-    </div>
-
-    <div class="nav-links">
-      <a href="{% url 'post-detail-view' post.id %}" class="btn-link">Back to Post</a>
-      <a href="{% url 'replies' post.id %}" class="btn-link">View Replies</a>
-    </div>
+<div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
+  
+  <div class="post-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: #f9f9f9; margin-bottom: 30px;border:1px solid black;">
+    <h2 style="color: #333;">{{ post.title }}</h2>
+    <p style="color: #555; line-height: 1.6;">{{ post.content }}</p>
+    <p style="color: #666; font-size: 14px; margin-top: 10px;">
+      <strong>Author:</strong> {{ post.author.username }} |
+      <strong>Category:</strong> {{ post.category.name }}
+    </p>
   </div>
+
+  <div class="comment-section" style="margin-bottom: 30px;">
+    <h3 style="border-bottom: 2px solid #0066cc; padding-bottom: 5px; color: #0066cc;">Comments</h3>
+    {% if comments %}
+      <ul class="comment-list" style="list-style-type: none; padding: 0;">
+        {% for comment in comments %}
+          <li class="comment" style="border-bottom: 1px solid #eee; padding: 15px 0;">
+            <p style="color: #444; font-size: 16px;">{{ comment.content }}</p>
+            <p class="meta" style="color: #888; font-size: 13px; margin-top: 5px;">
+              <small>
+                By: {% if comment.user %}{{ comment.user.username }}{% else %}Anonymous{% endif %}
+                &nbsp;|&nbsp; {{ comment.created_at|date:"M d, Y H:i" }}
+              </small>
+            </p>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p style="color: #999; font-style: italic;">No comments yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="add-comment-form" style="margin-bottom: 40px;">
+    <h4 style="color: #333;">Add a Comment</h4>
+    <form method="post">
+      {% csrf_token %}
+      <textarea name="content" rows="5" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;" ></textarea>
+      <button type="submit" style="margin-top: 10px; background-color: #0066cc; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+        Submit Comment
+      </button>
+    </form>
+  </div>
+
+  <div class="nav-links" style="display: flex; gap: 15px;">
+    <a href="{% url 'post-detail-view' post.id %}" class="btn-link" style="color: #0066cc; font-weight: 600; text-decoration: none;"> Back to Post</a>
+    <a href="{% url 'replies' post.id %}" class="btn-link" style="color: #0066cc; font-weight: 600; text-decoration: none;">View Replies</a>
+  </div>
+
+</div>
 {% endblock %}

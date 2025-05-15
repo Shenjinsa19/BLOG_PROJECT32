@@ -1,24 +1,16 @@
 {% extends 'blog/base.html' %}
 
-{% block title %}Admin Login{% endblock %}
-
 {% block content %}
-<div class="main-content">
-    <h2>Admin Login</h2>
+  <h2>Admin Login</h2>
 
-    {% if error %}
-        <p class="error-message">{{ error }}</p>
-    {% endif %}
+  {% if form.errors %}
+    <p style="color: red;">Invalid username or password.</p>
+  {% endif %}
 
-    <form method="POST" class="form-container">
-        {% csrf_token %}
-        <label for="username">Username:</label><br>
-        <input type="text" name="username" class="form-input"><br><br>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
 
-        <label for="password">Password:</label><br>
-        <input type="password" name="password" class="form-input"><br><br>
-
-        <button type="submit" class="btn">Login</button>
-    </form>
-</div>
+    <button type="submit">Login</button>
+  </form>
 {% endblock %}

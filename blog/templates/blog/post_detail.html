@@ -1,44 +1,81 @@
 {% extends 'blog/base.html' %}
+{% block title %}particular post details{% endblock %}
 
 {% block content %}
-<div class="post-detail-container">
-    <h2 class="post-title">{{ post.title }}</h2>
-    <p class="post-content">{{ post.content }}</p>
-    <p><strong>Author:</strong> {{ post.author.username }}</p>
-    <p><strong>Category:</strong> {{ post.category.name }}</p>
-    <p><strong>Likes:</strong> {{ like_count }}</p>
-    <p><strong>Dislikes:</strong> {{ dislike_count }}</p>
+<div class="post-detail-container" style="max-width: 800px; margin: 40px auto; padding: 30px; background-color: #fefefe; border-radius: 10px;border: 1px solid #181818;">
+    
+    <!-- Post Title -->
+    <h2 style="font-size: 32px; color: #222; margin-bottom: 10px;">{{ post.title }}</h2>
+    
+    <!-- Author & Category Info -->
+    <p style="color: #555; font-size: 16px; margin-bottom: 10px;">
+        <strong>Author:</strong> {{ post.author.username }} |
+        <strong>Category:</strong> {{ post.category.name }}
+    </p>
 
-    <div class="post-actions">
-        <a href="{% url 'like-post' post.id %}" class="action-link">Like</a>
-        <a href="{% url 'dislike-post' post.id %}" class="action-link">Dislike</a>
-        <a href="{% url 'comment-list-create' post.id %}" class="action-link">Comment</a>
+    <!-- Post Content -->
+    <p style="font-size: 17px; color: #444; line-height: 1.7; margin-top: 20px;">
+        <strong>content:</strong>{{ post.content }}</p>
+
+    <!-- Likes & Dislikes -->
+    <div style="margin-top: 20px; font-size: 16px;">
+        <p><strong>Likes:</strong> {{ like_count }}</p>
+        <p><strong>Dislikes:</strong> {{ dislike_count }}</p>
     </div>
 
-    <hr>
-    <h3>Comments</h3>
+    <!-- Action Buttons -->
+    <div class="post-actions" style="margin-top: 20px;">
+        <a href="{% url 'like-post' post.id %}" class="action-link" style="margin-right: 15px; color: #0066cc; font-weight: bold; text-decoration: none;"> Like</a>
+        <a href="{% url 'dislike-post' post.id %}" class="action-link" style="margin-right: 15px; color: #cc0000; font-weight: bold; text-decoration: none;"> Dislike</a>
+        <a href="{% url 'comment-list-create' post.id %}" class="action-link" style="color: #007700; font-weight: bold; text-decoration: none;">💬 Comment</a>
+        
+        {% if user == post.author %}
+          <a href="{% url 'post-delete' post.id %}" class="action-link" style="color: #c00; margin-left: 10px;text-decoration: none;font-size: 16px;">
+              Delete Post
+          </a>
+        {% endif %}
+    </div>
+
+    <hr style="margin: 30px 0;">
+
+    <!-- Comments Section -->
+    <h3 style="font-size: 24px; color: #333;">Comments</h3>
 
     {% for comment in comments %}
-    <div class="comment-item">
-        <p><strong>
-            {% if comment.user %}
-                {{ comment.user.username }}
-            {% else %}
-                Anonymous
-            {% endif %}
-        </strong>: {{ comment.content }}</p>
-        <p class="comment-time">{{ comment.created_at }}</p>
+      <div class="comment-item" style="background-color: #f8f8f8; padding: 15px; margin-top: 15px; border-radius: 6px;">
+          <p style="margin: 0 0 8px 0;">
+              <strong>
+                  {% if comment.user %}
+                      {{ comment.user.username }}
+                  {% else %}
+                      Anonymous
+                  {% endif %}
+              </strong>:
+              {{ comment.content }}
+          </p>
+          <p class="comment-time" style="font-size: 13px; color: #999;">{{ comment.created_at }}</p>
 
-        <div class="comment-actions">
-            <a href="{% url 'comment-like' comment.id %}" class="action-link">Like ({{ comment.likes.count }})</a>
-            <a href="{% url 'comment-dislike' comment.id %}" class="action-link">Dislike ({{ comment.dislikes.count }})</a>
-        </div>
-    </div>
-    <hr>
+          <div class="comment-actions" style="margin-top: 5px;">
+              <a href="{% url 'comment-like' comment.id %}" class="action-link" style="margin-right: 10px; text-decoration: none; color: #0066cc;">Like ({{ comment.likes.count }})</a>
+              <a href="{% url 'comment-dislike' comment.id %}" class="action-link" style="text-decoration: none; color: #cc0000;">Dislike ({{ comment.dislikes.count }})</a>
+              <a href="{% url 'replies' comment.id %}" class="action-link" style="margin-left: 10px; color: #007700; text-decoration: none;">Comment</a>
+          </div>
+      </div>
     {% empty %}
-    <p>No comments yet.</p>
+      <p style="color: #777; margin-top: 10px;">No comments yet.</p>
     {% endfor %}
 
-    <a href="{% url 'post_list_create_view' %}" class="back-to-list">Back to Post List</a>
+    <!-- Back to Posts -->
+    <div style="margin-top: 40px; text-align: center;">
+        <a href="{% url 'post_list_create_view' %}" class="back-to-list" style="
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+        "> Back to Posts</a>
+    </div>
 </div>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'blog/base.html' %}
+{% block title %}post lists{% endblock %}
+{% block content %}
+<div class="post-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: #0066cc;"></h2>
+    <a href="{% url 'post-create-view' %}" class="btn post-btn">Create Post</a>
+</div>
+<h1 style="margin-bottom:10px;cursor: pointer;">Posts</h1>
+{% if posts %}
+    <div class="post-list">
+        {% for post in posts %}
+            <div class="post-card">
+                <h3 class="post-title">{{ post.title }}</h3>
+                <p class="post-snippet">{{ post.content|truncatewords:30 }}</p>
+                <a href="{% url 'post-detail-view' post.id %}" class="btn-link">Read more</a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No posts available.</p>
+{% endif %}
+{% endblock %}

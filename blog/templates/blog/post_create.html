@@ -1,0 +1,47 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Create New Blog Post{% endblock %}
+
+{% block content %}
+<div class="create-post-container" style="
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    
+">
+    <h2 style="text-align: center; color: #333; margin-bottom: 30px;">Create a New Blog Post</h2>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div class="form-group" style="display: flex; flex-direction: column;">
+            <label for="{{ field.id_for_label }}" style="font-weight: 600; margin-bottom: 6px;">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+                <div style="color: red; font-size: 13px;">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" style="
+            padding: 12px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+           ">
+            Submit Post
+        </button>
+    </form>
+</div>
+{% endblock %}

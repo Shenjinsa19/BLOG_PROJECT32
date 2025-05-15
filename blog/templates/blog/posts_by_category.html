@@ -1,20 +1,33 @@
 {% extends 'blog/base.html' %}
-
+{% block title %}posts based on category{% endblock %}
 {% block content %}
-  <h2>Posts in "{{ category.name }}"</h2>
+  <section style="max-width: 800px; margin: 40px auto; padding: 0 15px;">
+    <h2 style="color: #004080; border-bottom: 2px solid #0066cc; padding-bottom: 8px; margin-bottom: 30px;">
+      Posts in "{{ category.name }}"
+    </h2>
 
-  {% for post in posts %}
-    <div style="margin-bottom: 30px;">
-      <h3>{{ post.title }}</h3>
-      <p><strong>Author:</strong> {{ post.author.username }} | <strong>Posted on:</strong> {{ post.created_at|date:"F j, Y" }}</p>
-      <p>{{ post.content|truncatechars:200 }}</p>
-      <a href="{% url 'post-detail-view' post.id %}">Read more</a>
+    {% for post in posts %}
+      <article style="margin-bottom: 40px; padding-bottom: 15px; border-bottom: 1px solid #ddd;">
+        <h3 style="color: #003366; font-size: 24px; margin-bottom: 6px;">{{ post.title }}</h3>
+        <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
+          <strong>Author:</strong> {{ post.author.username }} &nbsp;|&nbsp; 
+          <strong>Posted on:</strong> {{ post.created_at|date:"F j, Y" }}
+        </p>
+        <p style="font-size: 16px; color: #333; line-height: 1.5;">
+          {{ post.content|truncatechars:200 }}
+        </p>
+        <a href="{% url 'post-detail-view' post.id %}" style="color: #0066cc; font-weight: bold; text-decoration: none;">
+          Read more &rarr;
+        </a>
+      </article>
+    {% empty %}
+      <p style="font-style: italic; color: #888;">No posts in this category.</p>
+    {% endfor %}
+
+    <div style="margin-top: 40px;">
+      <a href="{% url 'category-list' %}" style="color: #0066cc; text-decoration: none; font-weight: bold;">
+        &larr;Back to Categories
+      </a>
     </div>
-    <hr>
-  {% empty %}
-    <p>No posts in this category.</p>
-  {% endfor %}
-
-  <br>
-  <a href="{% url 'category-list' %}">← Back to Categories</a>
+  </section>
 {% endblock %}

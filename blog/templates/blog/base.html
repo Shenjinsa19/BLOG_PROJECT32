@@ -10,10 +10,12 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="{% url 'post_list_create_view' %}" class="nav-logo">My Blog</a>
+            <span class="nav-logo">My Blog</span>
             <div class="nav-links">
+    
                 <a class="nav-links-login" href="{% url 'login' %}">Login</a>
                 <a class="nav-links-register" href="{% url 'register' %}">Register</a>
+                <a class="nav-links-admin-login" style="color:white;text-decoration:none;"href="{% url 'admin-login' %}">Admin</a>
             </div>
         </div>
     </nav>

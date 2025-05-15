@@ -97,6 +97,7 @@ form textarea {
   font-weight: bold;
   border-radius: 4px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 /* Post Items */
@@ -211,4 +212,13 @@ textarea {
 .comment-time {
   font-size: 13px; 
   color: #777;
+}
+.post-list{
+  cursor: pointer;
+}
+.like-post-container{
+  cursor: default;
+}
+.post{
+  border-radius: 20px;
 }

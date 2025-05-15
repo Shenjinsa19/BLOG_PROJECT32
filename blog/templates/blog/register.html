@@ -3,32 +3,60 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="main-content">
-    <h2>Register</h2>
-    <form method="POST">
+<div class="register-container" style="
+    max-width: 450px;
+    margin: 80px auto;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+">
+    <h2 style="
+        text-align: center;
+        margin-bottom: 30px;
+        color: #333;
+    ">Create a New Account</h2>
+
+    <form method="POST" style="display: flex; flex-direction: column; gap: 20px;">
         {% csrf_token %}
 
         <div class="form-group">
-            <label for="{{ form.username.id_for_label }}">Username:</label>
+            <label for="{{ form.username.id_for_label }}" style="font-weight: 600;">Username:</label>
             {{ form.username }}
         </div>
 
         <div class="form-group">
-            <label for="{{ form.email.id_for_label }}">Email:</label>
+            <label for="{{ form.email.id_for_label }}" style="font-weight: 600;">Email:</label>
             {{ form.email }}
         </div>
 
         <div class="form-group">
-            <label for="{{ form.password1.id_for_label }}">Password:</label>
+            <label for="{{ form.password1.id_for_label }}" style="font-weight: 600;">Password:</label>
             {{ form.password1 }}
         </div>
 
         <div class="form-group">
-            <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+            <label for="{{ form.password2.id_for_label }}" style="font-weight: 600;">Confirm Password:</label>
             {{ form.password2 }}
         </div>
 
-        <button type="submit" class="btn-submit">Register</button>
+        <button type="submit" class="btn-submit" style="
+            background-color: #0066cc;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            
+        " >
+            Register
+        </button>
     </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+        Already an User?
+        <a href="{% url 'login' %}" style="color: #0066cc; text-decoration: none; font-weight: bold;">Login here</a>
+    </p>
 </div>
 {% endblock %}

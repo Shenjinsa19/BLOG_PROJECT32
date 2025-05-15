@@ -226,9 +226,6 @@ from django.http import HttpResponse
 
 
 
-def home(request):
-    return render(request, 'blog/home.html')
-
 
 
 
@@ -279,38 +276,52 @@ def login_view(request):
     return render(request, 'blog/login.html', {'form': form})
 
 
+# def admin_login_view(request):
+#     if request.method == "POST":
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(username=username, password=password)
+#         if user is not None and user.is_staff:
+#             login(request, user)
+#             return redirect('/admin/')
+#         else:
+#             return "Invalid admin credentials"
+#     return render(request, 'blog/admin_login.html')
+from django.contrib.auth.forms import AuthenticationForm
+
 def admin_login_view(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None and user.is_staff:
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
-            return redirect('/admin/')
-        else:
-            return "Invalid admin credentials"
-    return render(request, 'blog/admin_login.html')
+            return redirect('admin-dashboard')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'blog/admin_login.html', {'form': form})
+
+
 
 
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
-@login_required
-def post_list_create_view(request):
-    posts = Post.objects.all().order_by('-created_at')
+# @login_required
+# def post_list_create_view(request):
+#     posts = Post.objects.all().order_by('-created_at')
 
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user 
-            post.save()
-            return redirect('post_list_create_view')
-    else:
-        form = PostForm()
-    return render(request, 'blog/post_list_create_view.html', {'posts': posts, 'form': form})
+#     if request.method == 'POST':
+#         form = PostForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user 
+#             post.save()
+#             return redirect('post_list_create_view')
+#     else:
+#         form = PostForm()
+#     return render(request, 'blog/post_list_create_view.html', {'posts': posts, 'form': form})
 
 
-@login_required
+# @login_required
 def post_detail_view(request, pk):
     post = get_object_or_404(Post, id=pk)
     like_count = post.likes.count()
@@ -511,3 +522,26 @@ def posts_by_category_view(request, category_id):
 
 
 
+from django.views.generic import ListView, CreateView
+
+class PostListView(ListView):            #list all pos
+    model = Post
+    template_name = 'blog/post_list.html'  
+    context_object_name = 'posts'
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post                     #create post with auth
+    form_class = PostForm
+    template_name = 'blog/post_create.html'
+    success_url = reverse_lazy('home') 
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+  
+
+def home_view(request):
+    posts = Post.objects.all().order_by('-created_at')  # Or '-id' if you don't have a timestamp
+    return render(request, 'blog/home.html', {'posts': posts})
