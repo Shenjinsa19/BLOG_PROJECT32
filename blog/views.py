@@ -222,6 +222,16 @@ from django.http import HttpResponse
 #     def perform_create(self, serializer):
 #       parent_comment = Comment.objects.get(id=self.kwargs['comment_id'])
 #       serializer.save(parent=parent_comment, post=parent_comment.post)
+
+
+
+
+def home(request):
+    return render(request, 'blog/home.html')
+
+
+
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin    #/...........DELETE
 from django.views.generic import DeleteView
 from django.urls import reverse_lazy
