@@ -2,7 +2,8 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import (PostCreateView,PostListView, CommentListCreateView,post_like_view,post_dislike_view,my_disliked_posts_view,comment_replies_view, comment_detail_with_replies_view,register_view,login_view,admin_login_view,post_detail_view,user_list_view,category_list_view,comment_like_view,comment_dislike_view,posts_by_category_view,PostDeleteView)
-
+from django.urls import path
+from . import views
 
 urlpatterns = [
     # path('posts/', PostListCreateView.as_view(), name='post-list-create'),  #crt post
@@ -36,5 +37,8 @@ urlpatterns = [
     path('category/<int:category_id>/posts/', posts_by_category_view, name='posts-by-category'),#...........unnecc
     path('', PostListView.as_view(), name='post_list_create_view'),#post create
     path('create/', PostCreateView.as_view(), name='post-create-view'),#list of post
+    # path('dashboard/', views.admin_dashboard, name='admin-dashboard'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+

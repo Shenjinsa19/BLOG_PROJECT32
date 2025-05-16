@@ -224,7 +224,27 @@ from django.http import HttpResponse
 #       serializer.save(parent=parent_comment, post=parent_comment.post)
 
 
+# @login_required
+# def post_list_create_view(request):
+#     posts = Post.objects.all().order_by('-created_at')
 
+#     if request.method == 'POST':
+#         form = PostForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.author = request.user 
+#             post.save()
+#             return redirect('post_list_create_view')
+#     else:
+#         form = PostForm()
+#     return render(request, 'blog/post_list_create_view.html', {'posts': posts, 'form': form})
+
+
+
+# class CommentDetailWithRepliesView(RetrieveAPIView):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+#     permission_classes = [IsAuthenticatedOrReadOnly]
 
 
 
@@ -245,14 +265,11 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 
-# class CommentDetailWithRepliesView(RetrieveAPIView):
-#     queryset = Comment.objects.all()
-#     serializer_class = CommentSerializer
-#     permission_classes = [IsAuthenticatedOrReadOnly]
 
 from django.contrib.auth.forms import  AuthenticationForm
 from .forms import CustomUserCreationForm
 from django.contrib.auth import login as auth_login, authenticate
+
 def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -276,50 +293,27 @@ def login_view(request):
     return render(request, 'blog/login.html', {'form': form})
 
 
-# def admin_login_view(request):
-#     if request.method == "POST":
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(username=username, password=password)
-#         if user is not None and user.is_staff:
-#             login(request, user)
-#             return redirect('/admin/')
-#         else:
-#             return "Invalid admin credentials"
-#     return render(request, 'blog/admin_login.html')
-from django.contrib.auth.forms import AuthenticationForm
+
+
 
 def admin_login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
-            return redirect('admin-dashboard')
+            if user.is_staff or user.is_superuser:
+                login(request, user)
+                return redirect('/admin/') 
+            else:
+                form.add_error(None, "You do not have admin access.")
     else:
         form = AuthenticationForm()
     return render(request, 'blog/admin_login.html', {'form': form})
 
 
 
-
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
-# @login_required
-# def post_list_create_view(request):
-#     posts = Post.objects.all().order_by('-created_at')
-
-#     if request.method == 'POST':
-#         form = PostForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.author = request.user 
-#             post.save()
-#             return redirect('post_list_create_view')
-#     else:
-#         form = PostForm()
-#     return render(request, 'blog/post_list_create_view.html', {'posts': posts, 'form': form})
-
 
 # @login_required
 def post_detail_view(request, pk):
@@ -541,7 +535,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
   
-
 def home_view(request):
-    posts = Post.objects.all().order_by('-created_at')  # Or '-id' if you don't have a timestamp
+    posts = Post.objects.all().order_by('-created_at')  
     return render(request, 'blog/home.html', {'posts': posts})
