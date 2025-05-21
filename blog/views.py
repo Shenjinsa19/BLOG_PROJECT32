@@ -538,3 +538,4 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 def home_view(request):
     posts = Post.objects.all().order_by('-created_at')  
     return render(request, 'blog/home.html', {'posts': posts})
+

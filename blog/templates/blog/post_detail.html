@@ -18,52 +18,101 @@
         <strong>content:</strong>{{ post.content }}</p>
 
     <!-- Likes & Dislikes -->
-    <div style="margin-top: 20px; font-size: 16px;">
-        <p><strong>Likes:</strong> {{ like_count }}</p>
-        <p><strong>Dislikes:</strong> {{ dislike_count }}</p>
-    </div>
+    <!-- Likes & Dislikes -->
+<!-- <div style="margin-top: 20px; font-size: 16px;">
+    <p><strong>Likes:</strong> {{ like_count }}</p>
+    <p><strong>Dislikes:</strong> {{ dislike_count }}</p>
+</div> -->
 
-    <!-- Action Buttons -->
-    <div class="post-actions" style="margin-top: 20px;">
-        <a href="{% url 'like-post' post.id %}" class="action-link" style="margin-right: 15px; color: #0066cc; font-weight: bold; text-decoration: none;"> Like</a>
-        <a href="{% url 'dislike-post' post.id %}" class="action-link" style="margin-right: 15px; color: #cc0000; font-weight: bold; text-decoration: none;"> Dislike</a>
-        <a href="{% url 'comment-list-create' post.id %}" class="action-link" style="color: #007700; font-weight: bold; text-decoration: none;">💬 Comment</a>
-        
-        {% if user == post.author %}
-          <a href="{% url 'post-delete' post.id %}" class="action-link" style="color: #c00; margin-left: 10px;text-decoration: none;font-size: 16px;">
-              Delete Post
-          </a>
-        {% endif %}
-    </div>
+<!-- Action Buttons -->
+<div class="post-actions" style="margin-top: 20px;">
+
+    <!-- Like button as plain text link -->
+    <form action="{% url 'like-post' post.id %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" 
+                style="all: unset; color: #0066cc; font-weight: bold; cursor: pointer; text-decoration: underline;">
+            Like({{like_count}})
+        </button>
+    </form>
+
+    <!-- Dislike button as plain text link -->
+    <form action="{% url 'dislike-post' post.id %}" method="post" style="display: inline; margin-left: 15px;">
+        {% csrf_token %}
+        <button type="submit" 
+                style="all: unset; color: #cc0000; font-weight: bold; cursor: pointer; text-decoration: underline;">
+            Dislike( {{ dislike_count }})
+        </button>
+    </form>
+
+    <a href="{% url 'comment-list-create' post.id %}" class="action-link" style="color: #007700; font-weight: bold; text-decoration: none;">💬 Comment</a>
+
+    {% if user == post.author %}
+      <a href="{% url 'post-delete' post.id %}" class="action-link" style="color: #c00; margin-left: 10px;text-decoration: none;font-size: 16px;">
+          Delete Post
+      </a>
+    {% endif %}
+</div>
+
 
     <hr style="margin: 30px 0;">
 
     <!-- Comments Section -->
-    <h3 style="font-size: 24px; color: #333;">Comments</h3>
+    <h3 style="font-size: 20px; color: #333;">Comments</h3>
 
-    {% for comment in comments %}
-      <div class="comment-item" style="background-color: #f8f8f8; padding: 15px; margin-top: 15px; border-radius: 6px;">
-          <p style="margin: 0 0 8px 0;">
-              <strong>
-                  {% if comment.user %}
-                      {{ comment.user.username }}
-                  {% else %}
-                      Anonymous
-                  {% endif %}
-              </strong>:
-              {{ comment.content }}
-          </p>
-          <p class="comment-time" style="font-size: 13px; color: #999;">{{ comment.created_at }}</p>
+{% for comment in comments %}
+  <div class="comment-item" style="background-color: #f8f8f8; padding: 15px; margin-top: 15px; border-radius: 6px;">
+    
 
-          <div class="comment-actions" style="margin-top: 5px;">
-              <a href="{% url 'comment-like' comment.id %}" class="action-link" style="margin-right: 10px; text-decoration: none; color: #0066cc;">Like ({{ comment.likes.count }})</a>
-              <a href="{% url 'comment-dislike' comment.id %}" class="action-link" style="text-decoration: none; color: #cc0000;">Dislike ({{ comment.dislikes.count }})</a>
-              <a href="{% url 'replies' comment.id %}" class="action-link" style="margin-left: 10px; color: #007700; text-decoration: none;">Comment</a>
-          </div>
-      </div>
-    {% empty %}
-      <p style="color: #777; margin-top: 10px;">No comments yet.</p>
-    {% endfor %}
+    <p style="margin: 0 0 8px 0;">
+        <strong>
+            {% if comment.user %}
+                {{ comment.user.username }}
+            {% else %}
+                Anonymous
+            {% endif %}
+        </strong>: {{ comment.content }}
+    </p>
+
+
+    <p class="comment-time" style="font-size: 13px; color: #999; margin-bottom: 18px;">
+        created at:{{ comment.created_at }}
+    </p>
+
+
+    <div class="comment-actions" style="margin-top: 5px;">
+
+        <form action="{% url 'comment-like' comment.id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" 
+                    style="all: unset; color: #0066cc; font-weight: bold; cursor: pointer; text-decoration: underline;">
+                Like ({{ comment.likes.count }})
+            </button>
+        </form>
+
+    
+        <form action="{% url 'comment-dislike' comment.id %}" method="post" style="display: inline; margin-left: 10px;">
+            {% csrf_token %}
+            <button type="submit" 
+                    style="all: unset; color: #cc0000; font-weight: bold; cursor: pointer; text-decoration: underline;">
+                Dislike ({{ comment.dislikes.count }})
+            </button>
+        </form>
+
+    
+        <a href="{% url 'replies' comment.id %}" class="action-link" style="color: #007700; font-weight: bold; text-decoration: none;">💬 Comment</a>
+            
+        </a>
+    </div>
+</div>
+
+
+
+
+{% empty %}
+  <p style="color: #777; margin-top: 10px;">No comments yet.</p>
+{% endfor %}
+
 
     <!-- Back to Posts -->
     <div style="margin-top: 40px; text-align: center;">
